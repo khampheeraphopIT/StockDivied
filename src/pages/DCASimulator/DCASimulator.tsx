@@ -15,7 +15,7 @@ import {
   type DCAResult,
   type RealDCAResult,
 } from "@/utils/calculators";
-import { formatCurrency } from "@/utils/formatters";
+import { formatCurrency, getCurrencySymbol } from "@/utils/formatters";
 import {
   AreaChart,
   Area,
@@ -28,7 +28,7 @@ import {
 } from "recharts";
 
 export function DCASimulatorPage() {
-  const { t, locale } = useI18n();
+  const { t, locale, currency } = useI18n();
   const tt = t.tools.dcaSimulator;
 
   const [mode, setMode] = useState<"fixed" | "real">("fixed");
@@ -58,22 +58,23 @@ export function DCASimulatorPage() {
       if (stockData.length === 0)
         throw new Error("No data found for this timeframe");
 
-      // Map USD prices to THB by matching the Year-Month
-      const thbData = stockData.map((p) => {
+      // Convert USD prices to target currency by matching the Year-Month
+      const convertedData = stockData.map((p) => {
         const yearMonth = p.date.substring(0, 7);
         const matchedRate = exchangeData.find(
           (r) => r.date.substring(0, 7) === yearMonth,
         );
-        const rate = matchedRate ? matchedRate.price : 34.0; // Fallback to 34 THB if missing
+        const baseRate = matchedRate ? matchedRate.price : 34.0; // Fallback to 34 THB if missing
+        const finalRate = currency === "USD" ? 1 : baseRate;
 
         return {
           timestamp: p.timestamp,
           date: p.date,
-          price: p.price * rate,
+          price: p.price * finalRate,
         };
       });
 
-      setHistoricalPrices(thbData);
+      setHistoricalPrices(convertedData);
       setSelectedTicker(ticker);
     } catch (err) {
       setError(
@@ -155,7 +156,7 @@ export function DCASimulatorPage() {
             type="number"
             value={initial}
             onChange={(e) => setInitial(Number(e.target.value))}
-            suffix={t.common.currency}
+            suffix={getCurrencySymbol(currency)}
             min={0}
           />
           <InputField
@@ -163,7 +164,7 @@ export function DCASimulatorPage() {
             type="number"
             value={monthlyInvestment}
             onChange={(e) => setMonthlyInvestment(Number(e.target.value))}
-            suffix={t.common.currency}
+            suffix={getCurrencySymbol(currency)}
             min={0}
           />
           <InputField
@@ -247,7 +248,7 @@ export function DCASimulatorPage() {
                 <div className="result-item">
                   <span className="label">{tt.totalInvested}</span>
                   <span className="value">
-                    {formatCurrency(result.totalInvested)}
+                    {formatCurrency(result.totalInvested, currency)}
                   </span>
                 </div>
                 <div className="result-item">
@@ -258,7 +259,7 @@ export function DCASimulatorPage() {
                       : " (DCA)"}
                   </span>
                   <span className="value positive">
-                    {formatCurrency(result.portfolioValue)}
+                    {formatCurrency(result.portfolioValue, currency)}
                   </span>
                 </div>
                 <div className="result-item">
@@ -266,13 +267,13 @@ export function DCASimulatorPage() {
                   <span
                     className={`value ${result.totalReturn >= 0 ? "positive" : "negative"}`}
                   >
-                    {formatCurrency(result.totalReturn)}
+                    {formatCurrency(result.totalReturn, currency)}
                   </span>
                 </div>
                 <div className="result-item">
                   <span className="label">{tt.vsLumpSum}</span>
                   <span className="value">
-                    {formatCurrency(result.lumpSumValue)}
+                    {formatCurrency(result.lumpSumValue, currency)}
                   </span>
                 </div>
               </div>
@@ -296,7 +297,9 @@ export function DCASimulatorPage() {
                         border: "1px solid rgba(255,255,255,0.1)",
                         borderRadius: 8,
                       }}
-                      formatter={(value) => formatCurrency(Number(value))}
+                      formatter={(value) =>
+                        formatCurrency(Number(value), currency)
+                      }
                     />
                     <Legend />
                     <Area

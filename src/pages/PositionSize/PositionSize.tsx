@@ -10,10 +10,14 @@ import {
   fetchCurrentExchangeRate,
 } from "@/services/stockApi";
 import { calculatePositionSize } from "@/utils/calculators";
-import { formatCurrency, formatNumber } from "@/utils/formatters";
+import {
+  formatCurrency,
+  formatNumber,
+  getCurrencySymbol,
+} from "@/utils/formatters";
 
 export function PositionSizePage() {
-  const { t, locale } = useI18n();
+  const { t, locale, currency } = useI18n();
   const tt = t.tools.positionSize;
 
   const [accountSize, setAccountSize] = useState(1000000);
@@ -32,10 +36,11 @@ export function PositionSizePage() {
         fetchCurrentQuote(ticker),
         fetchCurrentExchangeRate("USD", "THB"),
       ]);
-      const thbPrice = quote.price * rate;
-      setEntryPrice(thbPrice);
+      const finalRate = currency === "USD" ? 1 : rate;
+      const convertedPrice = quote.price * finalRate;
+      setEntryPrice(convertedPrice);
       // Auto-set stop loss to 5% below entry price as a starting point
-      setStopLoss(Number((thbPrice * 0.95).toFixed(2)));
+      setStopLoss(Number((convertedPrice * 0.95).toFixed(2)));
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Failed to fetch stock data",
@@ -82,7 +87,7 @@ export function PositionSizePage() {
             type="number"
             value={accountSize}
             onChange={(e) => setAccountSize(Number(e.target.value))}
-            suffix={t.common.currency}
+            suffix={getCurrencySymbol(currency)}
             min={0}
           />
           <InputField
@@ -100,7 +105,7 @@ export function PositionSizePage() {
             type="number"
             value={entryPrice}
             onChange={(e) => setEntryPrice(Number(e.target.value))}
-            suffix={t.common.currency}
+            suffix={getCurrencySymbol(currency)}
             min={0}
           />
           <InputField
@@ -108,7 +113,7 @@ export function PositionSizePage() {
             type="number"
             value={stopLoss}
             onChange={(e) => setStopLoss(Number(e.target.value))}
-            suffix={t.common.currency}
+            suffix={getCurrencySymbol(currency)}
             min={0}
           />
           <div className="button-row">
@@ -141,13 +146,13 @@ export function PositionSizePage() {
             <div className="result-item">
               <span className="label">{tt.riskAmount}</span>
               <span className="value negative">
-                {formatCurrency(result.riskAmount)}
+                {formatCurrency(result.riskAmount, currency)}
               </span>
             </div>
             <div className="result-item">
               <span className="label">{tt.positionValue}</span>
               <span className="value">
-                {formatCurrency(result.positionValue)}
+                {formatCurrency(result.positionValue, currency)}
               </span>
             </div>
           </div>

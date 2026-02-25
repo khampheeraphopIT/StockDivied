@@ -10,10 +10,14 @@ import {
   fetchCurrentExchangeRate,
 } from "@/services/stockApi";
 import { calculateDividend } from "@/utils/calculators";
-import { formatCurrency, formatPercent } from "@/utils/formatters";
+import {
+  formatCurrency,
+  formatPercent,
+  getCurrencySymbol,
+} from "@/utils/formatters";
 
 export function DividendCalculatorPage() {
-  const { t } = useI18n();
+  const { t, currency } = useI18n();
   const tt = t.tools.dividendCalc;
 
   const [sharePrice, setSharePrice] = useState(100);
@@ -32,12 +36,15 @@ export function DividendCalculatorPage() {
         fetchCurrentQuote(ticker),
         fetchCurrentExchangeRate("USD", "THB"),
       ]);
+      const finalRate = currency === "USD" ? 1 : rate;
 
-      setSharePrice(quote.price * rate);
+      setSharePrice(quote.price * finalRate);
       if (quote.dividendRate !== null) {
-        setAnnualDividend(quote.dividendRate * rate);
+        setAnnualDividend(quote.dividendRate * finalRate);
       } else if (quote.dividendYield !== null) {
-        setAnnualDividend((quote.dividendYield / 100) * quote.price * rate);
+        setAnnualDividend(
+          (quote.dividendYield / 100) * quote.price * finalRate,
+        );
       } else {
         setAnnualDividend(0);
       }
@@ -90,7 +97,7 @@ export function DividendCalculatorPage() {
             type="number"
             value={sharePrice}
             onChange={(e) => setSharePrice(Number(e.target.value))}
-            suffix={t.common.currency}
+            suffix={getCurrencySymbol(currency)}
             min={0}
           />
           <InputField
@@ -98,7 +105,7 @@ export function DividendCalculatorPage() {
             type="number"
             value={annualDividend}
             onChange={(e) => setAnnualDividend(Number(e.target.value))}
-            suffix={t.common.currency}
+            suffix={getCurrencySymbol(currency)}
             min={0}
             step={0.01}
           />
@@ -140,19 +147,19 @@ export function DividendCalculatorPage() {
             <div className="result-item">
               <span className="label">{tt.annualIncome}</span>
               <span className="value positive">
-                {formatCurrency(result.annualIncome)}
+                {formatCurrency(result.annualIncome, currency)}
               </span>
             </div>
             <div className="result-item">
               <span className="label">{tt.monthlyIncome}</span>
               <span className="value positive">
-                {formatCurrency(result.monthlyIncome)}
+                {formatCurrency(result.monthlyIncome, currency)}
               </span>
             </div>
             <div className="result-item">
               <span className="label">{tt.afterTaxIncome}</span>
               <span className="value">
-                {formatCurrency(result.afterTaxIncome)}
+                {formatCurrency(result.afterTaxIncome, currency)}
               </span>
             </div>
           </div>

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/Button/Button";
 import { InputIcon } from "@/components/icons/InputIcon";
 import { ChartBarIcon } from "@/components/icons/ChartBarIcon";
 import { calculateCompoundInterest } from "@/utils/calculators";
-import { formatCurrency } from "@/utils/formatters";
+import { formatCurrency, getCurrencySymbol } from "@/utils/formatters";
 import {
   AreaChart,
   Area,
@@ -19,7 +19,7 @@ import {
 } from "recharts";
 
 export function CompoundInterestPage() {
-  const { t } = useI18n();
+  const { t, currency } = useI18n();
   const tt = t.tools.compoundInterest;
 
   const [principal, setPrincipal] = useState(100000);
@@ -58,7 +58,7 @@ export function CompoundInterestPage() {
             type="number"
             value={principal}
             onChange={(e) => setPrincipal(Number(e.target.value))}
-            suffix="฿"
+            suffix={getCurrencySymbol(currency)}
             min={0}
           />
           <InputField
@@ -66,7 +66,7 @@ export function CompoundInterestPage() {
             type="number"
             value={monthly}
             onChange={(e) => setMonthly(Number(e.target.value))}
-            suffix="฿"
+            suffix={getCurrencySymbol(currency)}
             min={0}
           />
           <InputField
@@ -117,19 +117,19 @@ export function CompoundInterestPage() {
             <div className="result-item">
               <span className="label">{tt.futureValue}</span>
               <span className="value positive">
-                {formatCurrency(result.futureValue)}
+                {formatCurrency(result.futureValue, currency)}
               </span>
             </div>
             <div className="result-item">
               <span className="label">{tt.totalContributions}</span>
               <span className="value">
-                {formatCurrency(result.totalContributions)}
+                {formatCurrency(result.totalContributions, currency)}
               </span>
             </div>
             <div className="result-item">
               <span className="label">{tt.totalInterest}</span>
               <span className="value positive">
-                {formatCurrency(result.totalInterest)}
+                {formatCurrency(result.totalInterest, currency)}
               </span>
             </div>
           </div>
@@ -153,7 +153,7 @@ export function CompoundInterestPage() {
                     border: "1px solid rgba(255,255,255,0.1)",
                     borderRadius: 8,
                   }}
-                  formatter={(value) => formatCurrency(Number(value))}
+                  formatter={(value) => formatCurrency(Number(value), currency)}
                 />
                 <Legend />
                 <Area

@@ -1,4 +1,5 @@
 export type Locale = "th" | "en";
+export type Currency = "THB" | "USD";
 
 export interface TranslationKeys {
   // App

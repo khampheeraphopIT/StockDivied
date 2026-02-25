@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import type { ReactNode } from "react";
-import type { Locale } from "./types";
+import type { Locale, Currency } from "./types";
 import { th } from "./th";
 import { en } from "./en";
 import { I18nContext } from "./I18nContext";
@@ -13,8 +13,15 @@ function detectLocale(): Locale {
   return "th";
 }
 
+function detectCurrency(): Currency {
+  const saved = localStorage.getItem("stockdived-currency") as Currency | null;
+  if (saved === "THB" || saved === "USD") return saved;
+  return "THB";
+}
+
 export function I18nProvider({ children }: { children: ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>(detectLocale);
+  const [currency, setCurrencyState] = useState<Currency>(detectCurrency);
 
   const setLocale = (l: Locale) => {
     setLocaleState(l);
@@ -22,8 +29,17 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     document.documentElement.lang = l;
   };
 
+  const setCurrency = (c: Currency) => {
+    setCurrencyState(c);
+    localStorage.setItem("stockdived-currency", c);
+  };
+
   const toggleLocale = () => {
     setLocale(locale === "th" ? "en" : "th");
+  };
+
+  const toggleCurrency = () => {
+    setCurrency(currency === "THB" ? "USD" : "THB");
   };
 
   useEffect(() => {
@@ -32,7 +48,15 @@ export function I18nProvider({ children }: { children: ReactNode }) {
 
   return (
     <I18nContext.Provider
-      value={{ locale, t: translations[locale], setLocale, toggleLocale }}
+      value={{
+        locale,
+        currency,
+        t: translations[locale],
+        setLocale,
+        toggleLocale,
+        setCurrency,
+        toggleCurrency,
+      }}
     >
       {children}
     </I18nContext.Provider>

@@ -14,10 +14,11 @@ import {
   formatCurrency,
   formatPercent,
   formatMultiplier,
+  getCurrencySymbol,
 } from "@/utils/formatters";
 
 export function CAGRPage() {
-  const { t, locale } = useI18n();
+  const { t, locale, currency } = useI18n();
   const tt = t.tools.cagr;
 
   const [beginValue, setBeginValue] = useState(100000);
@@ -38,17 +39,22 @@ export function CAGRPage() {
       if (stockData.length < 2)
         throw new Error("Not enough historical data for this timeframe");
 
-      const thbData = stockData.map((p) => {
+      const convertedData = stockData.map((p) => {
         const yearMonth = p.date.substring(0, 7);
         const matchedRate = exchangeData.find(
           (r) => r.date.substring(0, 7) === yearMonth,
         );
-        const rate = matchedRate ? matchedRate.price : 34.0;
-        return { timestamp: p.timestamp, date: p.date, price: p.price * rate };
+        const baseRate = matchedRate ? matchedRate.price : 34.0;
+        const finalRate = currency === "USD" ? 1 : baseRate;
+        return {
+          timestamp: p.timestamp,
+          date: p.date,
+          price: p.price * finalRate,
+        };
       });
 
-      setBeginValue(thbData[0].price);
-      setEndValue(thbData[thbData.length - 1].price);
+      setBeginValue(convertedData[0].price);
+      setEndValue(convertedData[convertedData.length - 1].price);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Failed to fetch historical data",
@@ -90,7 +96,7 @@ export function CAGRPage() {
             type="number"
             value={beginValue}
             onChange={(e) => setBeginValue(Number(e.target.value))}
-            suffix={t.common.currency}
+            suffix={getCurrencySymbol(currency)}
             min={0}
           />
           <InputField
@@ -98,7 +104,7 @@ export function CAGRPage() {
             type="number"
             value={endValue}
             onChange={(e) => setEndValue(Number(e.target.value))}
-            suffix={t.common.currency}
+            suffix={getCurrencySymbol(currency)}
             min={0}
           />
           <InputField
@@ -143,7 +149,7 @@ export function CAGRPage() {
               <span
                 className={`value ${result.absoluteReturn >= 0 ? "positive" : "negative"}`}
               >
-                {formatCurrency(result.absoluteReturn)}
+                {formatCurrency(result.absoluteReturn, currency)}
               </span>
             </div>
             <div className="result-item">

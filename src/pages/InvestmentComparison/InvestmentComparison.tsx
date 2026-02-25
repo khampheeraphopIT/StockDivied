@@ -14,7 +14,7 @@ import {
   type ComparisonResult,
   type RealComparisonResult,
 } from "@/utils/calculators";
-import { formatCurrency } from "@/utils/formatters";
+import { formatCurrency, getCurrencySymbol } from "@/utils/formatters";
 import {
   BarChart,
   Bar,
@@ -27,7 +27,7 @@ import {
 } from "recharts";
 
 export function InvestmentComparisonPage() {
-  const { t, locale } = useI18n();
+  const { t, locale, currency } = useI18n();
   const tt = t.tools.investmentCompare;
 
   const [mode, setMode] = useState<"fixed" | "real">("fixed");
@@ -68,16 +68,21 @@ export function InvestmentComparisonPage() {
       ]);
       if (stockData.length === 0) throw new Error("No data");
 
-      const thbData = stockData.map((p) => {
+      const convertedData = stockData.map((p) => {
         const yearMonth = p.date.substring(0, 7);
         const matchedRate = exchangeData.find(
           (r) => r.date.substring(0, 7) === yearMonth,
         );
-        const rate = matchedRate ? matchedRate.price : 34.0;
-        return { timestamp: p.timestamp, date: p.date, price: p.price * rate };
+        const baseRate = matchedRate ? matchedRate.price : 34.0;
+        const finalRate = currency === "USD" ? 1 : baseRate;
+        return {
+          timestamp: p.timestamp,
+          date: p.date,
+          price: p.price * finalRate,
+        };
       });
 
-      setHistoryA(thbData);
+      setHistoryA(convertedData);
       setTickerA(ticker);
     } catch (err) {
       setErrorA(err instanceof Error ? err.message : "Failed");
@@ -98,16 +103,21 @@ export function InvestmentComparisonPage() {
       ]);
       if (stockData.length === 0) throw new Error("No data");
 
-      const thbData = stockData.map((p) => {
+      const convertedData = stockData.map((p) => {
         const yearMonth = p.date.substring(0, 7);
         const matchedRate = exchangeData.find(
           (r) => r.date.substring(0, 7) === yearMonth,
         );
-        const rate = matchedRate ? matchedRate.price : 34.0;
-        return { timestamp: p.timestamp, date: p.date, price: p.price * rate };
+        const baseRate = matchedRate ? matchedRate.price : 34.0;
+        const finalRate = currency === "USD" ? 1 : baseRate;
+        return {
+          timestamp: p.timestamp,
+          date: p.date,
+          price: p.price * finalRate,
+        };
       });
 
-      setHistoryB(thbData);
+      setHistoryB(convertedData);
       setTickerB(ticker);
     } catch (err) {
       setErrorB(err instanceof Error ? err.message : "Failed");
@@ -218,7 +228,7 @@ export function InvestmentComparisonPage() {
             type="number"
             value={amountA}
             onChange={(e) => setAmountA(Number(e.target.value))}
-            suffix={t.common.currency}
+            suffix={getCurrencySymbol(currency)}
             min={0}
           />
 
@@ -271,7 +281,7 @@ export function InvestmentComparisonPage() {
             type="number"
             value={amountB}
             onChange={(e) => setAmountB(Number(e.target.value))}
-            suffix={t.common.currency}
+            suffix={getCurrencySymbol(currency)}
             min={0}
           />
 
@@ -352,18 +362,22 @@ export function InvestmentComparisonPage() {
                   <span className="label">
                     {nameA} — {tt.finalValue}
                   </span>
-                  <span className="value">{formatCurrency(result.valueA)}</span>
+                  <span className="value">
+                    {formatCurrency(result.valueA, currency)}
+                  </span>
                 </div>
                 <div className="result-item">
                   <span className="label">
                     {nameB} — {tt.finalValue}
                   </span>
-                  <span className="value">{formatCurrency(result.valueB)}</span>
+                  <span className="value">
+                    {formatCurrency(result.valueB, currency)}
+                  </span>
                 </div>
                 <div className="result-item">
                   <span className="label">{tt.difference}</span>
                   <span className="value">
-                    {formatCurrency(result.difference)}
+                    {formatCurrency(result.difference, currency)}
                   </span>
                 </div>
                 <div className="result-item">
@@ -391,7 +405,9 @@ export function InvestmentComparisonPage() {
                         border: "1px solid rgba(255,255,255,0.1)",
                         borderRadius: 8,
                       }}
-                      formatter={(value) => formatCurrency(Number(value))}
+                      formatter={(value) =>
+                        formatCurrency(Number(value), currency)
+                      }
                     />
                     <Legend />
                     <Bar

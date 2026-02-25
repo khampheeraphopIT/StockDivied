@@ -5,7 +5,7 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 export function Navbar({ onToggleSidebar }: { onToggleSidebar: () => void }) {
-  const { t, locale, setLocale } = useI18n();
+  const { t, locale, setLocale, currency, setCurrency } = useI18n();
   const location = useLocation();
   const isHome = location.pathname === "/";
   const [menuOpen, setMenuOpen] = useState(false);
@@ -41,6 +41,21 @@ export function Navbar({ onToggleSidebar }: { onToggleSidebar: () => void }) {
           <Link to="/guide" className={styles.navbarLink}>
             {t.nav.guide}
           </Link>
+
+          <div className={styles.langSwitch} aria-label="Currency Toggle">
+            <button
+              className={`${styles.langBtn} ${currency === "THB" ? styles.langBtnActive : ""}`}
+              onClick={() => setCurrency("THB")}
+            >
+              THB
+            </button>
+            <button
+              className={`${styles.langBtn} ${currency === "USD" ? styles.langBtnActive : ""}`}
+              onClick={() => setCurrency("USD")}
+            >
+              USD
+            </button>
+          </div>
 
           <div className={styles.langSwitch} aria-label={t.common.language}>
             <button

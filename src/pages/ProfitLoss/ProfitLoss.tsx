@@ -10,10 +10,14 @@ import {
   fetchCurrentExchangeRate,
 } from "@/services/stockApi";
 import { calculateProfitLoss } from "@/utils/calculators";
-import { formatCurrency, formatPercent } from "@/utils/formatters";
+import {
+  formatCurrency,
+  formatPercent,
+  getCurrencySymbol,
+} from "@/utils/formatters";
 
 export function ProfitLossPage() {
-  const { t, locale } = useI18n();
+  const { t, locale, currency } = useI18n();
   const tt = t.tools.profitLoss;
 
   const [buyPrice, setBuyPrice] = useState(50);
@@ -32,7 +36,8 @@ export function ProfitLossPage() {
         fetchCurrentQuote(ticker),
         fetchCurrentExchangeRate("USD", "THB"),
       ]);
-      setSellPrice(quote.price * rate);
+      const finalRate = currency === "USD" ? 1 : rate;
+      setSellPrice(quote.price * finalRate);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Failed to fetch stock data",
@@ -74,7 +79,7 @@ export function ProfitLossPage() {
             type="number"
             value={buyPrice}
             onChange={(e) => setBuyPrice(Number(e.target.value))}
-            suffix={t.common.currency}
+            suffix={getCurrencySymbol(currency)}
             min={0}
           />
           <InputField
@@ -82,7 +87,7 @@ export function ProfitLossPage() {
             type="number"
             value={sellPrice}
             onChange={(e) => setSellPrice(Number(e.target.value))}
-            suffix={t.common.currency}
+            suffix={getCurrencySymbol(currency)}
             min={0}
           />
           <InputField
@@ -97,7 +102,7 @@ export function ProfitLossPage() {
             type="number"
             value={commission}
             onChange={(e) => setCommission(Number(e.target.value))}
-            suffix={t.common.currency}
+            suffix={getCurrencySymbol(currency)}
             min={0}
           />
           <div className="button-row">
@@ -126,7 +131,7 @@ export function ProfitLossPage() {
               <span
                 className={`value ${result.grossPL >= 0 ? "positive" : "negative"}`}
               >
-                {formatCurrency(result.grossPL)}
+                {formatCurrency(result.grossPL, currency)}
               </span>
             </div>
             <div className="result-item">
@@ -134,7 +139,7 @@ export function ProfitLossPage() {
               <span
                 className={`value ${result.netPL >= 0 ? "positive" : "negative"}`}
               >
-                {formatCurrency(result.netPL)}
+                {formatCurrency(result.netPL, currency)}
               </span>
             </div>
             <div className="result-item">
@@ -148,7 +153,7 @@ export function ProfitLossPage() {
             <div className="result-item">
               <span className="label">{tt.breakEvenPrice}</span>
               <span className="value">
-                {formatCurrency(result.breakEvenPrice)}
+                {formatCurrency(result.breakEvenPrice, currency)}
               </span>
             </div>
           </div>

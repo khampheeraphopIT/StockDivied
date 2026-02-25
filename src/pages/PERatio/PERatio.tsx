@@ -10,10 +10,14 @@ import {
   fetchCurrentExchangeRate,
 } from "@/services/stockApi";
 import { calculatePERatio } from "@/utils/calculators";
-import { formatNumber, formatCurrency } from "@/utils/formatters";
+import {
+  formatNumber,
+  formatCurrency,
+  getCurrencySymbol,
+} from "@/utils/formatters";
 
 export function PERatioPage() {
-  const { t } = useI18n();
+  const { t, currency } = useI18n();
   const tt = t.tools.peRatio;
 
   const [stockPrice, setStockPrice] = useState(150);
@@ -31,8 +35,10 @@ export function PERatioPage() {
         fetchCurrentQuote(ticker),
         fetchCurrentExchangeRate("USD", "THB"),
       ]);
-      setStockPrice(quote.price * rate);
-      if (quote.eps) setEps(quote.eps * rate);
+      const finalRate = currency === "USD" ? 1 : rate;
+
+      setStockPrice(quote.price * finalRate);
+      if (quote.eps) setEps(quote.eps * finalRate);
       // P/E ratio is derived from price / eps, but we don't automatically override industry PE
     } catch (err) {
       setError(
@@ -78,7 +84,7 @@ export function PERatioPage() {
             type="number"
             value={stockPrice}
             onChange={(e) => setStockPrice(Number(e.target.value))}
-            suffix={t.common.currency}
+            suffix={getCurrencySymbol(currency)}
             min={0}
           />
           <InputField
@@ -86,7 +92,7 @@ export function PERatioPage() {
             type="number"
             value={eps}
             onChange={(e) => setEps(Number(e.target.value))}
-            suffix={t.common.currency}
+            suffix={getCurrencySymbol(currency)}
             min={0}
             step={0.01}
           />
@@ -124,7 +130,9 @@ export function PERatioPage() {
             </div>
             <div className="result-item">
               <span className="label">{tt.fairValue}</span>
-              <span className="value">{formatCurrency(result.fairValue)}</span>
+              <span className="value">
+                {formatCurrency(result.fairValue, currency)}
+              </span>
             </div>
             <div className="result-item">
               <span className="label">{tt.valuation}</span>

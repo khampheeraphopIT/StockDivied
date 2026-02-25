@@ -1,11 +1,19 @@
-/** จัดรูปแบบตัวเลขเป็นสกุลเงินบาท */
-export function formatCurrency(value: number): string {
-  return new Intl.NumberFormat("th-TH", {
+/** จัดรูปแบบตัวเลขเป็นสกุลเงิน */
+export function formatCurrency(
+  value: number,
+  currency: "THB" | "USD" = "THB",
+): string {
+  const localeStr = currency === "USD" ? "en-US" : "th-TH";
+  return new Intl.NumberFormat(localeStr, {
     style: "currency",
-    currency: "THB",
+    currency: currency,
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(value);
+}
+
+export function getCurrencySymbol(currency: "THB" | "USD" = "THB"): string {
+  return currency === "USD" ? "$" : "฿";
 }
 
 /** จัดรูปแบบตัวเลขให้มีเครื่องหมายคั่นหลักพัน */
