@@ -221,6 +221,97 @@ export function calculateDCA(
   };
 }
 
+export interface RealDCAResult {
+  totalInvested: number;
+  portfolioValue: number;
+  totalReturn: number;
+  totalShares: number;
+  lumpSumValue: number;
+  lumpSumShares: number;
+  yearlyData: {
+    year: number;
+    dca: number;
+    lumpSum: number;
+    invested: number;
+  }[];
+}
+
+export function calculateRealDCA(
+  monthlyInvestment: number,
+  initialInvestment: number,
+  historicalPrices: { timestamp: number; price: number }[],
+): RealDCAResult {
+  if (historicalPrices.length === 0) {
+    return {
+      totalInvested: 0,
+      portfolioValue: 0,
+      totalReturn: 0,
+      totalShares: 0,
+      lumpSumValue: 0,
+      lumpSumShares: 0,
+      yearlyData: [],
+    };
+  }
+
+  const yearlyData: RealDCAResult["yearlyData"] = [];
+  let totalShares = 0;
+  let invested = 0;
+
+  // Lump sum sim
+  const firstPrice = historicalPrices[0].price;
+  const lumpSumShares = firstPrice > 0 ? initialInvestment / firstPrice : 0;
+
+  // DCA initial
+  if (initialInvestment > 0 && firstPrice > 0) {
+    totalShares += initialInvestment / firstPrice;
+    invested += initialInvestment;
+  }
+
+  // We want to record snapshots at the end of each simulated year
+  // For simplicity, we just divide the month index by 12.
+  for (let i = 0; i < historicalPrices.length; i++) {
+    const p = historicalPrices[i].price;
+
+    // Monthly DCA
+    if (i > 0 && p > 0) {
+      totalShares += monthlyInvestment / p;
+      invested += monthlyInvestment;
+    }
+
+    // Record every 12 months or the very last month
+    if ((i > 0 && (i + 1) % 12 === 0) || i === historicalPrices.length - 1) {
+      const yearLabel = Math.ceil((i + 1) / 12);
+
+      // Prevent duplicate year entries if the last month is exactly a multiple of 12
+      if (
+        yearlyData.length === 0 ||
+        yearlyData[yearlyData.length - 1].year !== yearLabel
+      ) {
+        yearlyData.push({
+          year: yearLabel,
+          dca: totalShares * p,
+          lumpSum: lumpSumShares * p,
+          invested: invested,
+        });
+      }
+    }
+  }
+
+  const finalPrice = historicalPrices[historicalPrices.length - 1].price;
+  const portfolioValue = totalShares * finalPrice;
+  const lumpSumValue = lumpSumShares * finalPrice;
+
+  return {
+    totalInvested: invested,
+    portfolioValue,
+    totalReturn: portfolioValue - invested,
+    totalShares,
+    lumpSumValue,
+    lumpSumShares,
+    yearlyData,
+  };
+}
+
 /* ===== Loan Calculator ===== */
 export interface LoanResult {
   monthlyPayment: number;
@@ -311,6 +402,81 @@ export function calculateComparison(
   const valueB = last?.valueB ?? amountB;
   const difference = Math.abs(valueA - valueB);
   let winner: ComparisonResult["winner"] = "tie";
+  if (valueA > valueB * 1.001) winner = "A";
+  else if (valueB > valueA * 1.001) winner = "B";
+
+  return { valueA, valueB, difference, winner, yearlyData };
+}
+
+export interface RealComparisonResult {
+  valueA: number;
+  valueB: number;
+  difference: number;
+  winner: "A" | "B" | "tie";
+  yearlyData: { year: number; valueA: number; valueB: number }[];
+}
+
+export function calculateRealComparison(
+  amountA: number,
+  historicalPricesA: { timestamp: number; price: number }[],
+  amountB: number,
+  historicalPricesB: { timestamp: number; price: number }[],
+): RealComparisonResult {
+  if (historicalPricesA.length === 0 && historicalPricesB.length === 0) {
+    return {
+      valueA: amountA,
+      valueB: amountB,
+      difference: Math.abs(amountA - amountB),
+      winner: amountA > amountB ? "A" : amountB > amountA ? "B" : "tie",
+      yearlyData: [],
+    };
+  }
+
+  const len = Math.max(historicalPricesA.length, historicalPricesB.length);
+  const yearlyData: RealComparisonResult["yearlyData"] = [];
+
+  let sharesA = 0;
+  let sharesB = 0;
+
+  if (historicalPricesA.length > 0 && historicalPricesA[0].price > 0) {
+    sharesA = amountA / historicalPricesA[0].price;
+  }
+  if (historicalPricesB.length > 0 && historicalPricesB[0].price > 0) {
+    sharesB = amountB / historicalPricesB[0].price;
+  }
+
+  for (let i = 0; i < len; i++) {
+    const pA =
+      i < historicalPricesA.length
+        ? historicalPricesA[i].price
+        : historicalPricesA[historicalPricesA.length - 1]?.price || 0;
+    const pB =
+      i < historicalPricesB.length
+        ? historicalPricesB[i].price
+        : historicalPricesB[historicalPricesB.length - 1]?.price || 0;
+
+    // Snapshot every 12 months or at the end
+    if ((i > 0 && (i + 1) % 12 === 0) || i === len - 1) {
+      const yearLabel = Math.ceil((i + 1) / 12);
+      if (
+        yearlyData.length === 0 ||
+        yearlyData[yearlyData.length - 1].year !== yearLabel
+      ) {
+        yearlyData.push({
+          year: yearLabel,
+          valueA: pA * sharesA || amountA, // fallback to amount if no growth
+          valueB: pB * sharesB || amountB,
+        });
+      }
+    }
+  }
+
+  const last = yearlyData[yearlyData.length - 1];
+  const valueA = last?.valueA ?? amountA;
+  const valueB = last?.valueB ?? amountB;
+  const difference = Math.abs(valueA - valueB);
+  let winner: RealComparisonResult["winner"] = "tie";
+
   if (valueA > valueB * 1.001) winner = "A";
   else if (valueB > valueA * 1.001) winner = "B";
 

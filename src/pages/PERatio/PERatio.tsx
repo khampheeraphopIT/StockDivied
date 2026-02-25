@@ -4,6 +4,8 @@ import { ChartBarIcon } from "@/components/icons/ChartBarIcon";
 import { useI18n } from "@/i18n";
 import { InputField } from "@/components/ui/Input/Input";
 import { Button } from "@/components/ui/Button/Button";
+import { StockSelector } from "@/components/ui/StockSelector/StockSelector";
+import { fetchCurrentQuote } from "@/services/stockApi";
 import { calculatePERatio } from "@/utils/calculators";
 import { formatNumber, formatCurrency } from "@/utils/formatters";
 
@@ -14,6 +16,26 @@ export function PERatioPage() {
   const [stockPrice, setStockPrice] = useState(150);
   const [eps, setEps] = useState(10);
   const [industryPE, setIndustryPE] = useState(15);
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleStockSelect = async (ticker: string) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const quote = await fetchCurrentQuote(ticker);
+      setStockPrice(quote.price);
+      if (quote.eps) setEps(quote.eps);
+      // P/E ratio is derived from price / eps, but we don't automatically override industry PE
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to fetch stock data",
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const result = calculatePERatio(stockPrice, eps, industryPE);
 
@@ -32,13 +54,25 @@ export function PERatioPage() {
 
       <div className="calculator-grid">
         <div className="input-section">
-          <div className="section-title"><InputIcon width={18} height={18} /> {t.common.input}</div>
+          <div className="section-title">
+            <InputIcon width={18} height={18} /> {t.common.input}
+          </div>
+
+          <StockSelector
+            onSelect={handleStockSelect}
+            isLoading={isLoading}
+            error={error}
+          />
+          <hr
+            style={{ margin: "1rem 0", borderColor: "rgba(255,255,255,0.06)" }}
+          />
+
           <InputField
             label={tt.stockPrice}
             type="number"
             value={stockPrice}
             onChange={(e) => setStockPrice(Number(e.target.value))}
-            suffix="฿"
+            suffix={t.common.currency}
             min={0}
           />
           <InputField
@@ -46,7 +80,7 @@ export function PERatioPage() {
             type="number"
             value={eps}
             onChange={(e) => setEps(Number(e.target.value))}
-            suffix="฿"
+            suffix={t.common.currency}
             min={0}
             step={0.01}
           />
@@ -65,6 +99,7 @@ export function PERatioPage() {
                 setStockPrice(150);
                 setEps(10);
                 setIndustryPE(15);
+                setError(null);
               }}
             >
               {t.common.reset}
@@ -73,7 +108,9 @@ export function PERatioPage() {
         </div>
 
         <div className="result-section">
-          <div className="section-title"><ChartBarIcon width={18} height={18} /> {t.common.results}</div>
+          <div className="section-title">
+            <ChartBarIcon width={18} height={18} /> {t.common.results}
+          </div>
           <div className="result-grid">
             <div className="result-item">
               <span className="label">{tt.peRatio}</span>

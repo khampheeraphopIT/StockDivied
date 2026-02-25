@@ -4,6 +4,8 @@ import { InputField } from "@/components/ui/Input/Input";
 import { Button } from "@/components/ui/Button/Button";
 import { InputIcon } from "@/components/icons/InputIcon";
 import { ChartBarIcon } from "@/components/icons/ChartBarIcon";
+import { StockSelector } from "@/components/ui/StockSelector/StockSelector";
+import { fetchCurrentQuote } from "@/services/stockApi";
 import { calculateDividend } from "@/utils/calculators";
 import { formatCurrency, formatPercent } from "@/utils/formatters";
 
@@ -15,6 +17,31 @@ export function DividendCalculatorPage() {
   const [annualDividend, setAnnualDividend] = useState(5);
   const [sharesOwned, setSharesOwned] = useState(1000);
   const [taxRate, setTaxRate] = useState(10);
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleStockSelect = async (ticker: string) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const quote = await fetchCurrentQuote(ticker);
+      setSharePrice(quote.price);
+      if (quote.dividendRate !== null) {
+        setAnnualDividend(quote.dividendRate);
+      } else if (quote.dividendYield !== null) {
+        setAnnualDividend((quote.dividendYield / 100) * quote.price);
+      } else {
+        setAnnualDividend(0);
+      }
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to fetch stock data",
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const result = calculateDividend(
     sharePrice,
@@ -28,6 +55,7 @@ export function DividendCalculatorPage() {
     setAnnualDividend(5);
     setSharesOwned(1000);
     setTaxRate(10);
+    setError(null);
   };
 
   return (
@@ -40,12 +68,22 @@ export function DividendCalculatorPage() {
           <div className="section-title">
             <InputIcon width={18} height={18} /> {t.common.input}
           </div>
+
+          <StockSelector
+            onSelect={handleStockSelect}
+            isLoading={isLoading}
+            error={error}
+          />
+          <hr
+            style={{ margin: "1rem 0", borderColor: "rgba(255,255,255,0.06)" }}
+          />
+
           <InputField
             label={tt.sharePrice}
             type="number"
             value={sharePrice}
             onChange={(e) => setSharePrice(Number(e.target.value))}
-            suffix="฿"
+            suffix={t.common.currency}
             min={0}
           />
           <InputField
@@ -53,7 +91,7 @@ export function DividendCalculatorPage() {
             type="number"
             value={annualDividend}
             onChange={(e) => setAnnualDividend(Number(e.target.value))}
-            suffix="฿"
+            suffix={t.common.currency}
             min={0}
             step={0.01}
           />

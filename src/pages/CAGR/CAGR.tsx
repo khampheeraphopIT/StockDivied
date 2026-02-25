@@ -4,6 +4,8 @@ import { ChartBarIcon } from "@/components/icons/ChartBarIcon";
 import { useI18n } from "@/i18n";
 import { InputField } from "@/components/ui/Input/Input";
 import { Button } from "@/components/ui/Button/Button";
+import { StockSelector } from "@/components/ui/StockSelector/StockSelector";
+import { fetchHistoricalData } from "@/services/stockApi";
 import { calculateCAGR } from "@/utils/calculators";
 import {
   formatCurrency,
@@ -12,12 +14,34 @@ import {
 } from "@/utils/formatters";
 
 export function CAGRPage() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const tt = t.tools.cagr;
 
   const [beginValue, setBeginValue] = useState(100000);
   const [endValue, setEndValue] = useState(250000);
   const [years, setYears] = useState(5);
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleStockSelect = async (ticker: string) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const data = await fetchHistoricalData(ticker, years);
+      if (data.length < 2)
+        throw new Error("Not enough historical data for this timeframe");
+
+      setBeginValue(data[0].price);
+      setEndValue(data[data.length - 1].price);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to fetch historical data",
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const result = calculateCAGR(beginValue, endValue, years);
 
@@ -28,13 +52,30 @@ export function CAGRPage() {
 
       <div className="calculator-grid">
         <div className="input-section">
-          <div className="section-title"><InputIcon width={18} height={18} /> {t.common.input}</div>
+          <div className="section-title">
+            <InputIcon width={18} height={18} /> {t.common.input}
+          </div>
+
+          <StockSelector
+            onSelect={handleStockSelect}
+            isLoading={isLoading}
+            error={error}
+            label={
+              locale === "th"
+                ? `ดึงข้อมูลย้อนหลัง ${years} ปี (ใส่ Ticker)`
+                : `Fetch ${years}-Year History (Type Ticker)`
+            }
+          />
+          <hr
+            style={{ margin: "1rem 0", borderColor: "rgba(255,255,255,0.06)" }}
+          />
+
           <InputField
             label={tt.beginValue}
             type="number"
             value={beginValue}
             onChange={(e) => setBeginValue(Number(e.target.value))}
-            suffix="฿"
+            suffix={t.common.currency}
             min={0}
           />
           <InputField
@@ -42,7 +83,7 @@ export function CAGRPage() {
             type="number"
             value={endValue}
             onChange={(e) => setEndValue(Number(e.target.value))}
-            suffix="฿"
+            suffix={t.common.currency}
             min={0}
           />
           <InputField
@@ -61,6 +102,7 @@ export function CAGRPage() {
                 setBeginValue(100000);
                 setEndValue(250000);
                 setYears(5);
+                setError(null);
               }}
             >
               {t.common.reset}
@@ -69,7 +111,9 @@ export function CAGRPage() {
         </div>
 
         <div className="result-section">
-          <div className="section-title"><ChartBarIcon width={18} height={18} /> {t.common.results}</div>
+          <div className="section-title">
+            <ChartBarIcon width={18} height={18} /> {t.common.results}
+          </div>
           <div className="result-grid">
             <div className="result-item">
               <span className="label">{tt.cagrResult}</span>
