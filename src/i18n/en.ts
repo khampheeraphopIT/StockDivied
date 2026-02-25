@@ -1,7 +1,7 @@
 import type { TranslationKeys } from "./types";
 
 export const en: TranslationKeys = {
-  appName: "StockDived",
+  appName: "StockDivied",
   appDescription: "All-in-One Investment Analysis Tools",
   appTagline: "Invest with Confidence",
 
@@ -264,7 +264,7 @@ export const en: TranslationKeys = {
   },
 
   footer: {
-    rights: "© 2026 StockDived. All rights reserved.",
+    rights: "© 2026 StockDivied. All rights reserved.",
     disclaimer:
       "This website is for educational purposes only. This is not investment advice.",
   },

@@ -1,7 +1,7 @@
 import type { TranslationKeys } from "./types";
 
 export const th: TranslationKeys = {
-  appName: "StockDived",
+  appName: "StockDivied",
   appDescription: "เครื่องมือวิเคราะห์การลงทุนครบวงจร",
   appTagline: "ตัดสินใจลงทุนอย่างมั่นใจ",
 
@@ -264,7 +264,7 @@ export const th: TranslationKeys = {
   },
 
   footer: {
-    rights: "© 2026 StockDived. สงวนลิขสิทธิ์.",
+    rights: "© 2026 StockDivied. สงวนลิขสิทธิ์.",
     disclaimer:
       "ข้อมูลในเว็บไซต์นี้มีวัตถุประสงค์เพื่อการศึกษาเท่านั้น ไม่ถือเป็นคำแนะนำด้านการลงทุน",
   },
