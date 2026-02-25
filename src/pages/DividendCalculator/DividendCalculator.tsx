@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/Button/Button";
 import { InputIcon } from "@/components/icons/InputIcon";
 import { ChartBarIcon } from "@/components/icons/ChartBarIcon";
 import { StockSelector } from "@/components/ui/StockSelector/StockSelector";
+import { AdBanner } from "@/components/ui/AdBanner/AdBanner";
 import {
   fetchCurrentQuote,
   fetchCurrentExchangeRate,
@@ -178,6 +179,7 @@ export function DividendCalculatorPage() {
           </div>
         </div>
       </div>
+      <AdBanner layout="horizontal" />
     </div>
   );
 }

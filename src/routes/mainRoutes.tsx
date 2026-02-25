@@ -14,6 +14,9 @@ import { BreakEvenPage } from "@/pages/BreakEven/BreakEven";
 import { InvestmentComparisonPage } from "@/pages/InvestmentComparison/InvestmentComparison";
 import { GuidePage } from "@/pages/Guide/Guide";
 import { NotFoundPage } from "@/pages/NotFound/NotFound";
+import { PrivacyPolicyPage } from "@/pages/Legal/PrivacyPolicy";
+import { TermsOfServicePage } from "@/pages/Legal/TermsOfService";
+import { DisclaimerPage } from "@/pages/Legal/Disclaimer";
 
 const routes: RouteObject[] = [
   {
@@ -31,6 +34,9 @@ const routes: RouteObject[] = [
       { path: "break-even", element: <BreakEvenPage /> },
       { path: "investment-comparison", element: <InvestmentComparisonPage /> },
       { path: "guide", element: <GuidePage /> },
+      { path: "privacy-policy", element: <PrivacyPolicyPage /> },
+      { path: "terms-of-service", element: <TermsOfServicePage /> },
+      { path: "disclaimer", element: <DisclaimerPage /> },
       { path: "*", element: <NotFoundPage /> },
     ],
   },

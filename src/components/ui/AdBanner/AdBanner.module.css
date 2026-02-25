@@ -1,0 +1,67 @@
+.adContainer {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 2rem 0;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+}
+
+.horizontal {
+  min-height: 90px;
+  max-width: 728px;
+  margin: 2rem auto;
+}
+
+.square {
+  min-height: 250px;
+  max-width: 300px;
+}
+
+.vertical {
+  min-height: 600px;
+  max-width: 160px;
+}
+
+.placeholder {
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 1.5rem;
+  color: #94a3b8;
+  position: relative;
+}
+
+.badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 0.70rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #cbd5e1;
+}
+
+.subtext {
+  margin: 0.5rem 0 0 0;
+  font-size: 0.85rem;
+  text-align: center;
+}

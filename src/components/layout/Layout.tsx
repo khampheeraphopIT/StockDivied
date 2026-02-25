@@ -3,6 +3,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import { Navbar } from "./Navbar/Navbar";
 import { Sidebar } from "./Sidebar/Sidebar";
 import { Footer } from "./Footer/Footer";
+import { CookieConsent } from "../ui/CookieConsent/CookieConsent";
 import styles from "./Layout.module.css";
 
 export function Layout() {
@@ -22,6 +23,7 @@ export function Layout() {
         <Outlet />
       </main>
       <Footer />
+      <CookieConsent />
     </div>
   );
 }

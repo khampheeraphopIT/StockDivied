@@ -4,6 +4,7 @@ import { TOOL_ROUTES } from "@/routes/toolRoutes";
 import type { TranslationKeys } from "@/i18n/types";
 import { Card } from "@/components/ui/Card/Card";
 import { Button } from "@/components/ui/Button/Button";
+import { AdBanner } from "@/components/ui/AdBanner/AdBanner";
 import styles from "./Home.module.css";
 
 function getToolName(t: TranslationKeys, toolId: string): string {
@@ -36,6 +37,10 @@ export function HomePage() {
             {t.home.getStarted}
           </Button>
         </div>
+      </section>
+
+      <section className="page-container" style={{ paddingBottom: 0 }}>
+        <AdBanner layout="horizontal" />
       </section>
 
       {/* Tools Grid */}
