@@ -3,7 +3,8 @@ import { Outlet, useLocation } from "react-router-dom";
 import { Navbar } from "./Navbar/Navbar";
 import { Sidebar } from "./Sidebar/Sidebar";
 import { Footer } from "./Footer/Footer";
-import "./Layout.css";
+import { CookieConsent } from "../ui/CookieConsent/CookieConsent";
+import styles from "./Layout.module.css";
 
 export function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -11,17 +12,18 @@ export function Layout() {
   const isHome = location.pathname === "/";
 
   return (
-    <div className={`layout ${isHome ? "layout-home" : "layout-tool"}`}>
+    <div className={styles.layout}>
       <Navbar onToggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
       {!isHome && (
         <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       )}
       <main
-        className={`layout-content ${isHome ? "" : "layout-content-with-sidebar"}`}
+        className={`${styles.layoutContent} ${!isHome ? styles.layoutContentWithSidebar : ""}`}
       >
         <Outlet />
       </main>
       <Footer />
+      <CookieConsent />
     </div>
   );
 }

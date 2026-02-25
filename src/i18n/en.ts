@@ -1,7 +1,7 @@
 import type { TranslationKeys } from "./types";
 
 export const en: TranslationKeys = {
-  appName: "StockDived",
+  appName: "StockDivied",
   appDescription: "All-in-One Investment Analysis Tools",
   appTagline: "Invest with Confidence",
 
@@ -132,11 +132,11 @@ export const en: TranslationKeys = {
       monthlyInvestment: "Monthly Investment",
       annualReturn: "Annual Return (%)",
       years: "Duration (Years)",
-      initialInvestment: "Initial Lump Sum",
+      initialInvestment: "Initial Investment",
       totalInvested: "Total Invested",
       portfolioValue: "Portfolio Value",
       totalReturn: "Total Return",
-      vsLumpSum: "vs Lump Sum",
+      vsLumpSum: "Initial Growth (without DCA)",
     },
     loanCalc: {
       name: "Loan Calculator",
@@ -182,7 +182,7 @@ export const en: TranslationKeys = {
     sections: [
       {
         id: "dividend",
-        title: "💰 What is Dividend Yield?",
+        title: "What is Dividend Yield?",
         content:
           "Dividend Yield shows how much a company pays in dividends relative to its share price. A higher yield means more income per dollar invested. Investors seeking passive income often favor stocks with consistent, high dividend yields.",
         formula:
@@ -191,7 +191,7 @@ export const en: TranslationKeys = {
       },
       {
         id: "compound",
-        title: "📈 Compound Interest — The Power of Time",
+        title: "Compound Interest — The Power of Time",
         content:
           "Compound interest means you earn interest on your interest. Over time, this creates exponential growth. Albert Einstein reportedly called it the 8th wonder of the world. The earlier you start, the more powerful the effect.",
         formula:
@@ -200,7 +200,7 @@ export const en: TranslationKeys = {
       },
       {
         id: "pe",
-        title: "📊 P/E Ratio — Cheap or Expensive?",
+        title: "P/E Ratio — Cheap or Expensive?",
         content:
           "The P/E Ratio measures how much you pay per dollar of earnings. A high P/E might mean the stock is overvalued; a low P/E could signal opportunity — or trouble. Always compare within the same industry.",
         formula: "P/E = Share Price ÷ Earnings Per Share (EPS)",
@@ -208,7 +208,7 @@ export const en: TranslationKeys = {
       },
       {
         id: "cagr",
-        title: "🚀 CAGR — The True Growth Rate",
+        title: "CAGR — The True Growth Rate",
         content:
           "CAGR shows the smoothed annual return of an investment, as if it grew at a steady rate every year. It's the best way to compare investments with different time horizons.",
         formula: "CAGR = (Ending Value ÷ Beginning Value)^(1/Years) - 1",
@@ -216,7 +216,7 @@ export const en: TranslationKeys = {
       },
       {
         id: "position",
-        title: "🎯 Position Sizing — Managing Risk",
+        title: "Position Sizing — Managing Risk",
         content:
           "Position sizing determines how many shares to buy based on how much you're willing to lose. It uses your account size, risk tolerance, and the distance between your entry price and stop loss.",
         formula: "Shares = (Account × Risk%) ÷ (Entry Price - Stop Loss)",
@@ -224,7 +224,7 @@ export const en: TranslationKeys = {
       },
       {
         id: "profitloss",
-        title: "💹 Profit & Loss Calculation",
+        title: "Profit & Loss Calculation",
         content:
           "Always include commissions and fees when calculating your real profit. ROI (Return on Investment) expresses your gain as a percentage, making it easy to compare trades.",
         formula: "ROI = ((Sell - Buy) × Qty - Fees) ÷ (Buy × Qty) × 100",
@@ -232,14 +232,14 @@ export const en: TranslationKeys = {
       },
       {
         id: "dca",
-        title: "🔄 DCA — Consistent Investing, Lower Risk",
+        title: "DCA — Consistent Investing, Lower Risk",
         content:
           "Dollar-Cost Averaging means investing a fixed amount regularly, regardless of price. It removes the stress of market timing and averages your cost basis over time.",
         tip: "DCA works best in volatile markets. In sustained bull markets, lump-sum investing may outperform.",
       },
       {
         id: "loan",
-        title: "🏦 Loans — How Much Will You Really Pay?",
+        title: "Loans — How Much Will You Really Pay?",
         content:
           "A loan calculator shows your monthly payment and total interest over the loan term. Understanding total cost helps decide between shorter or longer repayment periods.",
         formula: "M = P × [r(1+r)^n] ÷ [(1+r)^n - 1]",
@@ -247,7 +247,7 @@ export const en: TranslationKeys = {
       },
       {
         id: "breakeven",
-        title: "⚖️ Break-Even — When Do You Start Profiting?",
+        title: "Break-Even — When Do You Start Profiting?",
         content:
           "The break-even point is the number of units you must sell to cover all costs. Beyond this, every sale is profit. Margin of Safety shows how far your current sales exceed break-even.",
         formula: "BEP = Fixed Costs ÷ (Price - Variable Cost)",
@@ -255,7 +255,7 @@ export const en: TranslationKeys = {
       },
       {
         id: "compare",
-        title: "🔀 Comparing Investments",
+        title: "Comparing Investments",
         content:
           "Comparing two investment options side-by-side helps you choose the best path for your money. Look at final value, growth rate, and time horizon together.",
         tip: "Beyond returns, consider risk, liquidity, and tax implications.",
@@ -264,7 +264,7 @@ export const en: TranslationKeys = {
   },
 
   footer: {
-    rights: "© 2026 StockDived. All rights reserved.",
+    rights: "© 2026 StockDivied. All rights reserved.",
     disclaimer:
       "This website is for educational purposes only. This is not investment advice.",
   },

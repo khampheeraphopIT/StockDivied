@@ -1,4 +1,4 @@
-.not-found {
+.notFound {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -6,29 +6,29 @@
   text-align: center;
 }
 
-.not-found-content {
+.notFoundContent {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--space-md);
+  gap: 1rem;
 }
 
-.not-found-code {
+.notFoundCode {
   font-size: 6rem;
   font-weight: 800;
-  background: var(--accent-gradient);
+  background: linear-gradient(135deg, #6366f1, #8b5cf6, #a78bfa);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
   line-height: 1;
 }
 
-.not-found-title {
-  font-size: var(--font-size-2xl);
+.notFoundTitle {
+  font-size: 1.5rem;
   font-weight: 600;
 }
 
-.not-found-desc {
-  color: var(--text-secondary);
-  margin-bottom: var(--space-md);
+.notFoundDesc {
+  color: #94a3b8;
+  margin-bottom: 1rem;
 }

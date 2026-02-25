@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { InputIcon } from "@/components/icons/InputIcon";
+import { ChartBarIcon } from "@/components/icons/ChartBarIcon";
 import { useI18n } from "@/i18n";
 import { InputField } from "@/components/ui/Input/Input";
 import { Button } from "@/components/ui/Button/Button";
@@ -7,10 +9,11 @@ import {
   formatCurrency,
   formatNumber,
   formatPercent,
+  getCurrencySymbol,
 } from "@/utils/formatters";
 
 export function BreakEvenPage() {
-  const { t } = useI18n();
+  const { t, currency } = useI18n();
   const tt = t.tools.breakEven;
 
   const [fixedCosts, setFixedCosts] = useState(500000);
@@ -32,13 +35,15 @@ export function BreakEvenPage() {
 
       <div className="calculator-grid">
         <div className="input-section">
-          <div className="section-title">📥 {t.common.input}</div>
+          <div className="section-title">
+            <InputIcon width={18} height={18} /> {t.common.input}
+          </div>
           <InputField
             label={tt.fixedCosts}
             type="number"
             value={fixedCosts}
             onChange={(e) => setFixedCosts(Number(e.target.value))}
-            suffix="฿"
+            suffix={getCurrencySymbol(currency)}
             min={0}
           />
           <InputField
@@ -46,7 +51,7 @@ export function BreakEvenPage() {
             type="number"
             value={variableCost}
             onChange={(e) => setVariableCost(Number(e.target.value))}
-            suffix="฿"
+            suffix={getCurrencySymbol(currency)}
             min={0}
           />
           <InputField
@@ -54,7 +59,7 @@ export function BreakEvenPage() {
             type="number"
             value={pricePerUnit}
             onChange={(e) => setPricePerUnit(Number(e.target.value))}
-            suffix="฿"
+            suffix={getCurrencySymbol(currency)}
             min={0}
           />
           <InputField
@@ -81,7 +86,9 @@ export function BreakEvenPage() {
         </div>
 
         <div className="result-section">
-          <div className="section-title">📊 {t.common.results}</div>
+          <div className="section-title">
+            <ChartBarIcon width={18} height={18} /> {t.common.results}
+          </div>
           <div className="result-grid">
             <div className="result-item">
               <span className="label">{tt.breakEvenUnits}</span>
@@ -92,7 +99,7 @@ export function BreakEvenPage() {
             <div className="result-item">
               <span className="label">{tt.breakEvenRevenue}</span>
               <span className="value">
-                {formatCurrency(result.breakEvenRevenue)}
+                {formatCurrency(result.breakEvenRevenue, currency)}
               </span>
             </div>
             <div className="result-item">

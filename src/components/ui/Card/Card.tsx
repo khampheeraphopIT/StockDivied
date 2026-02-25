@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import "./Card.css";
+import styles from "./Card.module.css";
 
 interface CardProps {
   children: ReactNode;
@@ -16,7 +16,7 @@ export function Card({
 }: CardProps) {
   return (
     <div
-      className={`card ${glow ? "card-glow" : ""} ${onClick ? "card-clickable" : ""} ${className}`}
+      className={`${styles.card} ${glow ? styles.cardGlow : ""} ${onClick ? styles.cardClickable : ""} ${className}`}
       onClick={onClick}
       role={onClick ? "button" : undefined}
       tabIndex={onClick ? 0 : undefined}

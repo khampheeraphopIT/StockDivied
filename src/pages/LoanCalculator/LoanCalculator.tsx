@@ -1,12 +1,14 @@
 import { useState } from "react";
+import { InputIcon } from "@/components/icons/InputIcon";
+import { ChartBarIcon } from "@/components/icons/ChartBarIcon";
 import { useI18n } from "@/i18n";
 import { InputField } from "@/components/ui/Input/Input";
 import { Button } from "@/components/ui/Button/Button";
 import { calculateLoan } from "@/utils/calculators";
-import { formatCurrency } from "@/utils/formatters";
+import { formatCurrency, getCurrencySymbol } from "@/utils/formatters";
 
 export function LoanCalculatorPage() {
-  const { t } = useI18n();
+  const { t, currency } = useI18n();
   const tt = t.tools.loanCalc;
 
   const [loanAmount, setLoanAmount] = useState(3000000);
@@ -22,13 +24,15 @@ export function LoanCalculatorPage() {
 
       <div className="calculator-grid">
         <div className="input-section">
-          <div className="section-title">📥 {t.common.input}</div>
+          <div className="section-title">
+            <InputIcon width={18} height={18} /> {t.common.input}
+          </div>
           <InputField
             label={tt.loanAmount}
             type="number"
             value={loanAmount}
             onChange={(e) => setLoanAmount(Number(e.target.value))}
-            suffix="฿"
+            suffix={getCurrencySymbol(currency)}
             min={0}
           />
           <InputField
@@ -64,23 +68,27 @@ export function LoanCalculatorPage() {
         </div>
 
         <div className="result-section">
-          <div className="section-title">📊 {t.common.results}</div>
+          <div className="section-title">
+            <ChartBarIcon width={18} height={18} /> {t.common.results}
+          </div>
           <div className="result-grid">
             <div className="result-item">
               <span className="label">{tt.monthlyPayment}</span>
               <span className="value">
-                {formatCurrency(result.monthlyPayment)}
+                {formatCurrency(result.monthlyPayment, currency)}
               </span>
             </div>
             <div className="result-item">
               <span className="label">{tt.totalInterest}</span>
               <span className="value negative">
-                {formatCurrency(result.totalInterest)}
+                {formatCurrency(result.totalInterest, currency)}
               </span>
             </div>
             <div className="result-item">
               <span className="label">{tt.totalPaid}</span>
-              <span className="value">{formatCurrency(result.totalPaid)}</span>
+              <span className="value">
+                {formatCurrency(result.totalPaid, currency)}
+              </span>
             </div>
           </div>
         </div>

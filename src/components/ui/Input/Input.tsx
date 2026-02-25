@@ -1,6 +1,6 @@
 import type { InputHTMLAttributes } from "react";
 import { useId } from "react";
-import "./Input.css";
+import styles from "./Input.module.css";
 
 interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string;
@@ -17,15 +17,15 @@ export function InputField({
 }: InputFieldProps) {
   const id = useId();
   return (
-    <div className={`input-field ${className}`}>
-      <label htmlFor={id} className="input-label">
+    <div className={`${styles.inputField} ${className}`}>
+      <label htmlFor={id} className={styles.inputLabel}>
         {label}
       </label>
-      <div className="input-wrapper">
-        <input id={id} className="input-control" {...props} />
-        {suffix && <span className="input-suffix">{suffix}</span>}
+      <div className={styles.inputWrapper}>
+        <input id={id} className={styles.inputControl} {...props} />
+        {suffix && <span className={styles.inputSuffix}>{suffix}</span>}
       </div>
-      {hint && <span className="input-hint">{hint}</span>}
+      {hint && <span className={styles.inputHint}>{hint}</span>}
     </div>
   );
 }

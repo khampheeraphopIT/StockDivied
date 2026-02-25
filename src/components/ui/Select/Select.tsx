@@ -1,6 +1,6 @@
 import type { SelectHTMLAttributes } from "react";
 import { useId } from "react";
-import "./Select.css";
+import styles from "./Select.module.css";
 
 interface SelectOption {
   value: string;
@@ -20,11 +20,11 @@ export function SelectField({
 }: SelectFieldProps) {
   const id = useId();
   return (
-    <div className={`select-field ${className}`}>
-      <label htmlFor={id} className="select-label">
+    <div className={`${styles.selectField} ${className}`}>
+      <label htmlFor={id} className={styles.selectLabel}>
         {label}
       </label>
-      <select id={id} className="select-control" {...props}>
+      <select id={id} className={styles.selectControl} {...props}>
         {options.map((opt) => (
           <option key={opt.value} value={opt.value}>
             {opt.label}

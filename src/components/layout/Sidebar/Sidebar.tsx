@@ -2,7 +2,7 @@ import { NavLink } from "react-router-dom";
 import { useI18n } from "@/i18n";
 import { TOOL_ROUTES } from "@/routes/toolRoutes";
 import type { TranslationKeys } from "@/i18n/types";
-import "./Sidebar.css";
+import styles from "./Sidebar.module.css";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -21,14 +21,16 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
 
   return (
     <>
-      {isOpen && <div className="sidebar-overlay" onClick={onClose} />}
+      {isOpen && <div className={styles.sidebarOverlay} onClick={onClose} />}
 
-      <aside className={`sidebar ${isOpen ? "sidebar-open" : ""}`}>
-        <div className="sidebar-header">
-          <span className="sidebar-title">{t.nav.tools}</span>
+      <aside
+        className={`${styles.sidebar} ${isOpen ? styles.sidebarOpen : ""}`}
+      >
+        <div className={styles.sidebarHeader}>
+          <span className={styles.sidebarTitle}>{t.nav.tools}</span>
         </div>
 
-        <nav className="sidebar-nav">
+        <nav className={styles.sidebarNav}>
           {TOOL_ROUTES.map((tool) => {
             const Icon = tool.icon;
             return (
@@ -36,17 +38,17 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
                 key={tool.id}
                 to={tool.path}
                 className={({ isActive }) =>
-                  `sidebar-link ${isActive ? "sidebar-link-active" : ""}`
+                  `${styles.sidebarLink} ${isActive ? styles.sidebarLinkActive : ""}`
                 }
                 onClick={onClose}
               >
                 <span
-                  className="sidebar-icon"
+                  className={styles.sidebarIcon}
                   style={{ background: `${tool.color}20`, color: tool.color }}
                 >
                   <Icon width={18} height={18} />
                 </span>
-                <span className="sidebar-link-text">
+                <span className={styles.sidebarLinkText}>
                   {getToolName(t, tool.id)}
                 </span>
               </NavLink>
