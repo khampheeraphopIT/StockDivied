@@ -131,7 +131,7 @@ export function StockSelector({
     locale === "th"
       ? "ค้นหาหุ้น (คลิกเลือกหรือพิมพ์ Ticker แล้วกด Enter)"
       : "Search Stock (Select or type Ticker & Enter)";
-  const placeholderText = "e.g. AAPL, SPY, TSLA";
+  const placeholderText = "e.g. AAPL, VOO, PTT.BK, KBANK.BK";
 
   const showLoader = isLoading || isSearching;
 
