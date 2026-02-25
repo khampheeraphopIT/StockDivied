@@ -252,6 +252,26 @@ export function DCASimulatorPage() {
             </div>
           ) : (
             <>
+              {isReal &&
+                historicalPrices.length > 0 &&
+                Math.ceil(historicalPrices.length / 12) < years && (
+                  <div
+                    style={{
+                      padding: "1rem",
+                      marginBottom: "1.5rem",
+                      backgroundColor: "rgba(234, 179, 8, 0.1)",
+                      border: "1px solid rgba(234, 179, 8, 0.2)",
+                      borderRadius: "8px",
+                      color: "#eab308",
+                      fontSize: "0.95rem",
+                      lineHeight: "1.5",
+                    }}
+                  >
+                    {locale === "th"
+                      ? `⚠️ ข้อจำกัดข้อมูล: หุ้น ${selectedTicker?.toUpperCase()} มีข้อมูลย้อนหลังเพียง ${Math.ceil(historicalPrices.length / 12)} ปี ระบบจึงคำนวณเงินลงทุนและมูลค่าของพอร์ตทั้งหมดตามระยะเวลาที่มีข้อมูลจริงจนถึงปัจจุบันเท่านั้น`
+                      : `⚠️ Data Limitation: ${selectedTicker?.toUpperCase()} only has ${Math.ceil(historicalPrices.length / 12)} years of historical data. The simulation is capped to available data.`}
+                  </div>
+                )}
               <div className="result-grid">
                 <div className="result-item">
                   <span className="label">{tt.totalInvested}</span>
