@@ -322,11 +322,15 @@ export function DCASimulatorPage() {
                 <div className="result-item">
                   <span className="label">
                     {locale === "th"
-                      ? "มูลค่าถ้าลงทุนก้อนเดียว (Lump Sum)"
-                      : "Lump Sum Value (All at once)"}
+                      ? "กำไรจาก DCA เทียบกับเก็บเงินสด"
+                      : "DCA Profit vs. Holding Cash"}
                   </span>
-                  <span className="value">
-                    {formatCurrency(result.lumpSumValue, currency)}
+                  <span
+                    className={`value ${result.totalReturn >= 0 ? "positive" : "negative"}`}
+                  >
+                    {result.totalInvested > 0
+                      ? `+${((result.totalReturn / result.totalInvested) * 100).toFixed(1)}%`
+                      : "0%"}
                   </span>
                 </div>
               </div>
@@ -358,10 +362,14 @@ export function DCASimulatorPage() {
                     <Area
                       type="monotone"
                       dataKey="invested"
-                      stroke="#64748b"
-                      fill="#64748b"
-                      fillOpacity={0.2}
-                      name={tt.totalInvested}
+                      stroke="#f59e0b"
+                      fill="#f59e0b"
+                      fillOpacity={0.15}
+                      name={
+                        locale === "th"
+                          ? "เก็บเงินสด (ไม่ลงทุน)"
+                          : "Cash Savings (No Investment)"
+                      }
                     />
                     <Area
                       type="monotone"
@@ -369,18 +377,8 @@ export function DCASimulatorPage() {
                       stroke="#06b6d4"
                       fill="#06b6d4"
                       fillOpacity={0.3}
-                      name="DCA"
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="lumpSum"
-                      stroke="#f59e0b"
-                      fill="#f59e0b"
-                      fillOpacity={0.15}
                       name={
-                        locale === "th"
-                          ? "ลงทุนก้อนเดียว (Lump Sum)"
-                          : "Lump Sum"
+                        locale === "th" ? "มูลค่าพอร์ต DCA" : "DCA Portfolio"
                       }
                     />
                   </AreaChart>
