@@ -1,5 +1,28 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 const isDev = import.meta.env.DEV;
-const ALLORIGINS_PROXY = "https://api.allorigins.win/get?url=";
+const PROXIES = [
+  "https://api.allorigins.win/raw?url=",
+  "https://api.codetabs.com/v1/proxy/?quest=",
+];
+
+async function fetchWithProxy(targetUrl: string): Promise<Response> {
+  let lastError: Error | null = null;
+
+  for (const proxy of PROXIES) {
+    try {
+      const url = `${proxy}${encodeURIComponent(targetUrl)}`;
+      const res = await fetch(url);
+      if (res.ok) return res;
+      throw new Error(`Proxy ${proxy} returned ${res.status}`);
+    } catch (err: unknown) {
+      lastError = err as Error;
+      console.warn((err as Error).message);
+      // Try next proxy
+    }
+  }
+
+  throw lastError || new Error("All proxies failed");
+}
 
 export interface StockQuote {
   ticker: string;
@@ -35,11 +58,9 @@ export const fetchCurrentExchangeRate = async (
     }
 
     const url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${ticker}`;
-    const proxyUrl = `${ALLORIGINS_PROXY}${encodeURIComponent(url)}`;
-    const res = await fetch(proxyUrl);
+    const res = await fetchWithProxy(url);
     const data = await res.json();
-    const parsed = JSON.parse(data.contents);
-    const result = parsed?.quoteResponse?.result?.[0];
+    const result = data?.quoteResponse?.result?.[0];
     return result?.regularMarketPrice || 0;
   } catch (err) {
     console.error("Failed to fetch exchange rate", err);
@@ -92,11 +113,9 @@ export const fetchCurrentQuote = async (
 
   // Production fallback to CORS proxy
   const url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${ticker.toUpperCase()}`;
-  const proxyUrl = `${ALLORIGINS_PROXY}${encodeURIComponent(url)}`;
-  const res = await fetch(proxyUrl);
+  const res = await fetchWithProxy(url);
   const data = await res.json();
-  const parsed = JSON.parse(data.contents);
-  const result = parsed?.quoteResponse?.result?.[0];
+  const result = data?.quoteResponse?.result?.[0];
   if (!result) throw new Error("Ticker not found");
 
   return {
@@ -141,12 +160,10 @@ export const fetchHistoricalData = async (
 
   // Production fallback
   const url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker.toUpperCase()}?range=${years}y&interval=1mo`;
-  const proxyUrl = `${ALLORIGINS_PROXY}${encodeURIComponent(url)}`;
-  const res = await fetch(proxyUrl);
+  const res = await fetchWithProxy(url);
   const data = await res.json();
-  const parsed = JSON.parse(data.contents);
 
-  const result = parsed?.chart?.result?.[0];
+  const result = data?.chart?.result?.[0];
   if (!result) throw new Error("Data not found");
 
   const timestamps = result.timestamp || [];
@@ -202,13 +219,11 @@ export const searchStocks = async (query: string): Promise<SearchQuote[]> => {
 
   // Production fallback
   const url = `https://query2.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(query)}&quotesCount=10&newsCount=0`;
-  const proxyUrl = `${ALLORIGINS_PROXY}${encodeURIComponent(url)}`;
-  const res = await fetch(proxyUrl);
+  const res = await fetchWithProxy(url);
   const data = await res.json();
-  const parsed = JSON.parse(data.contents);
 
-  if (!parsed?.quotes) return [];
-  return parsed.quotes
+  if (!data?.quotes) return [];
+  return data.quotes
     .filter(
       (q: Record<string, unknown>) =>
         q.quoteType === "EQUITY" ||
