@@ -1,0 +1,14 @@
+[build]
+  command = "bun run build"
+  publish = "dist"
+  functions = "netlify/functions"
+
+[dev]
+  command = "bun dev"
+  targetPort = 5173
+  port = 8888
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
