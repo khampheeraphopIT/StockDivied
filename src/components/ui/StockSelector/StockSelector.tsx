@@ -4,6 +4,13 @@ import { searchStocks, type SearchQuote } from "@/services/stockApi";
 import styles from "./StockSelector.module.css";
 import { useI18n } from "@/i18n";
 
+/** Strip exchange suffixes (.BK, =F, =X) for clean display */
+function displayTicker(ticker: string): string {
+  return ticker
+    .replace(/\.(BK|TO|L|AX|HK|SI|KS|TW|NS|BO)$/i, "")
+    .replace(/=.+$/, "");
+}
+
 interface StockSelectorProps {
   label?: string;
   onSelect: (ticker: string) => void;
@@ -91,9 +98,9 @@ export function StockSelector({
   // Highlight index is reset in onChange or when dropdown opens
 
   const handleSelect = (ticker: string) => {
-    setInputValue(ticker);
+    setInputValue(displayTicker(ticker));
     setIsOpen(false);
-    onSelect(ticker);
+    onSelect(ticker); // Pass FULL ticker (with .BK etc.) to parent for API
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -123,7 +130,12 @@ export function StockSelector({
       }
     } else if (e.key === "Enter" && inputValue.trim()) {
       e.preventDefault();
-      handleSelect(inputValue.trim().toUpperCase());
+      const raw = inputValue.trim().toUpperCase();
+      // If user typed a short name like 'SCB', try to find and use the full ticker
+      const match = POPULAR_STOCKS.find(
+        (s) => displayTicker(s.ticker).toUpperCase() === raw,
+      );
+      handleSelect(match ? match.ticker : raw);
     }
   };
 
@@ -131,7 +143,7 @@ export function StockSelector({
     locale === "th"
       ? "ค้นหาหุ้น (คลิกเลือกหรือพิมพ์ Ticker แล้วกด Enter)"
       : "Search Stock (Select or type Ticker & Enter)";
-  const placeholderText = "e.g. AAPL, VOO, PTT.BK, KBANK.BK";
+  const placeholderText = "e.g. AAPL, VOO, PTT, KBANK, GC (ทองคำ)";
 
   const showLoader = isLoading || isSearching;
 
@@ -171,7 +183,9 @@ export function StockSelector({
                 onClick={() => handleSelect(s.ticker)}
                 onMouseEnter={() => setHighlightedIndex(index)}
               >
-                <div className={styles.tickerName}>{s.ticker}</div>
+                <div className={styles.tickerName}>
+                  {displayTicker(s.ticker)}
+                </div>
                 <div className={styles.companyName}>
                   {s.name} <span className={styles.sector}>({s.sector})</span>
                 </div>

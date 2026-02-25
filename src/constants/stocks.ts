@@ -252,4 +252,56 @@ export const POPULAR_STOCKS: StockInfo[] = [
   { ticker: "THAIETH.BK", name: "กองทุน SET50 ETF", sector: "ETF ไทย" },
   { ticker: "ENGY.BK", name: "กองทุน Energy ETF", sector: "ETF ไทย - พลังงาน" },
   { ticker: "GLD.BK", name: "กองทุน Gold ETF", sector: "ETF ไทย - ทองคำ" },
+
+  // ─── Commodities & Gold ───
+  { ticker: "GC=F", name: "ทองคำ (Gold Futures)", sector: "สินค้าโภคภัณฑ์" },
+  { ticker: "SI=F", name: "เงิน (Silver Futures)", sector: "สินค้าโภคภัณฑ์" },
+  {
+    ticker: "CL=F",
+    name: "น้ำมันดิบ (Crude Oil WTI)",
+    sector: "สินค้าโภคภัณฑ์",
+  },
+  {
+    ticker: "BZ=F",
+    name: "น้ำมันเบรนท์ (Brent Crude)",
+    sector: "สินค้าโภคภัณฑ์",
+  },
+  {
+    ticker: "NG=F",
+    name: "ก๊าซธรรมชาติ (Natural Gas)",
+    sector: "สินค้าโภคภัณฑ์",
+  },
+  { ticker: "PL=F", name: "แพลทินัม (Platinum)", sector: "สินค้าโภคภัณฑ์" },
+  { ticker: "HG=F", name: "ทองแดง (Copper)", sector: "สินค้าโภคภัณฑ์" },
+
+  // ─── Crypto ───
+  { ticker: "BTC-USD", name: "Bitcoin (BTC)", sector: "คริปโต" },
+  { ticker: "ETH-USD", name: "Ethereum (ETH)", sector: "คริปโต" },
+  { ticker: "SOL-USD", name: "Solana (SOL)", sector: "คริปโต" },
+  { ticker: "BNB-USD", name: "Binance Coin (BNB)", sector: "คริปโต" },
+  { ticker: "XRP-USD", name: "Ripple (XRP)", sector: "คริปโต" },
+  { ticker: "ADA-USD", name: "Cardano (ADA)", sector: "คริปโต" },
+  { ticker: "DOGE-USD", name: "Dogecoin (DOGE)", sector: "คริปโต" },
+
+  // ─── Currencies ───
+  {
+    ticker: "USDTHB=X",
+    name: "ดอลลาร์/บาท (USD/THB)",
+    sector: "อัตราแลกเปลี่ยน",
+  },
+  {
+    ticker: "EURUSD=X",
+    name: "ยูโร/ดอลลาร์ (EUR/USD)",
+    sector: "อัตราแลกเปลี่ยน",
+  },
+  {
+    ticker: "USDJPY=X",
+    name: "ดอลลาร์/เยน (USD/JPY)",
+    sector: "อัตราแลกเปลี่ยน",
+  },
+  {
+    ticker: "GBPUSD=X",
+    name: "ปอนด์/ดอลลาร์ (GBP/USD)",
+    sector: "อัตราแลกเปลี่ยน",
+  },
 ];
