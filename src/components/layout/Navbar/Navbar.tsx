@@ -14,15 +14,17 @@ export function Navbar({ onToggleSidebar }: { onToggleSidebar: () => void }) {
     <nav className={styles.navbar}>
       <div className={styles.navbarInner}>
         <div className={styles.navbarLeft}>
-          <button
-            className={styles.navbarHamburger}
-            onClick={onToggleSidebar}
-            aria-label="Toggle menu"
-          >
-            <span />
-            <span />
-            <span />
-          </button>
+          {!isHome && (
+            <button
+              className={styles.navbarHamburger}
+              onClick={onToggleSidebar}
+              aria-label="Toggle menu"
+            >
+              <span />
+              <span />
+              <span />
+            </button>
+          )}
           <Link to="/" className={styles.navbarBrand}>
             <BrandIcon className={styles.navbarLogo} />
             <span className={styles.navbarName}>{t.appName}</span>
