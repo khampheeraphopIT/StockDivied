@@ -5,7 +5,10 @@ import { useI18n } from "@/i18n";
 import { InputField } from "@/components/ui/Input/Input";
 import { Button } from "@/components/ui/Button/Button";
 import { StockSelector } from "@/components/ui/StockSelector/StockSelector";
-import { fetchCurrentQuote } from "@/services/stockApi";
+import {
+  fetchCurrentQuote,
+  fetchCurrentExchangeRate,
+} from "@/services/stockApi";
 import { calculatePositionSize } from "@/utils/calculators";
 import { formatCurrency, formatNumber } from "@/utils/formatters";
 
@@ -25,10 +28,14 @@ export function PositionSizePage() {
     setIsLoading(true);
     setError(null);
     try {
-      const quote = await fetchCurrentQuote(ticker);
-      setEntryPrice(quote.price);
+      const [quote, rate] = await Promise.all([
+        fetchCurrentQuote(ticker),
+        fetchCurrentExchangeRate("USD", "THB"),
+      ]);
+      const thbPrice = quote.price * rate;
+      setEntryPrice(thbPrice);
       // Auto-set stop loss to 5% below entry price as a starting point
-      setStopLoss(Number((quote.price * 0.95).toFixed(2)));
+      setStopLoss(Number((thbPrice * 0.95).toFixed(2)));
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Failed to fetch stock data",

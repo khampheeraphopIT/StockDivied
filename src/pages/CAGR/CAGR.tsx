@@ -5,7 +5,10 @@ import { useI18n } from "@/i18n";
 import { InputField } from "@/components/ui/Input/Input";
 import { Button } from "@/components/ui/Button/Button";
 import { StockSelector } from "@/components/ui/StockSelector/StockSelector";
-import { fetchHistoricalData } from "@/services/stockApi";
+import {
+  fetchHistoricalData,
+  fetchHistoricalExchangeRates,
+} from "@/services/stockApi";
 import { calculateCAGR } from "@/utils/calculators";
 import {
   formatCurrency,
@@ -28,12 +31,24 @@ export function CAGRPage() {
     setIsLoading(true);
     setError(null);
     try {
-      const data = await fetchHistoricalData(ticker, years);
-      if (data.length < 2)
+      const [stockData, exchangeData] = await Promise.all([
+        fetchHistoricalData(ticker, years),
+        fetchHistoricalExchangeRates("USD", "THB", years),
+      ]);
+      if (stockData.length < 2)
         throw new Error("Not enough historical data for this timeframe");
 
-      setBeginValue(data[0].price);
-      setEndValue(data[data.length - 1].price);
+      const thbData = stockData.map((p) => {
+        const yearMonth = p.date.substring(0, 7);
+        const matchedRate = exchangeData.find(
+          (r) => r.date.substring(0, 7) === yearMonth,
+        );
+        const rate = matchedRate ? matchedRate.price : 34.0;
+        return { timestamp: p.timestamp, date: p.date, price: p.price * rate };
+      });
+
+      setBeginValue(thbData[0].price);
+      setEndValue(thbData[thbData.length - 1].price);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Failed to fetch historical data",

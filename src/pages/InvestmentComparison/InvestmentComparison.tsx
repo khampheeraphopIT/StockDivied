@@ -4,7 +4,10 @@ import { InputField } from "@/components/ui/Input/Input";
 import { Button } from "@/components/ui/Button/Button";
 import { ChartBarIcon } from "@/components/icons/ChartBarIcon";
 import { StockSelector } from "@/components/ui/StockSelector/StockSelector";
-import { fetchHistoricalData } from "@/services/stockApi";
+import {
+  fetchHistoricalData,
+  fetchHistoricalExchangeRates,
+} from "@/services/stockApi";
 import {
   calculateComparison,
   calculateRealComparison,
@@ -59,9 +62,22 @@ export function InvestmentComparisonPage() {
     setLoadingA(true);
     setErrorA(null);
     try {
-      const data = await fetchHistoricalData(ticker, sharedYears);
-      if (data.length === 0) throw new Error("No data");
-      setHistoryA(data);
+      const [stockData, exchangeData] = await Promise.all([
+        fetchHistoricalData(ticker, sharedYears),
+        fetchHistoricalExchangeRates("USD", "THB", sharedYears),
+      ]);
+      if (stockData.length === 0) throw new Error("No data");
+
+      const thbData = stockData.map((p) => {
+        const yearMonth = p.date.substring(0, 7);
+        const matchedRate = exchangeData.find(
+          (r) => r.date.substring(0, 7) === yearMonth,
+        );
+        const rate = matchedRate ? matchedRate.price : 34.0;
+        return { timestamp: p.timestamp, date: p.date, price: p.price * rate };
+      });
+
+      setHistoryA(thbData);
       setTickerA(ticker);
     } catch (err) {
       setErrorA(err instanceof Error ? err.message : "Failed");
@@ -76,9 +92,22 @@ export function InvestmentComparisonPage() {
     setLoadingB(true);
     setErrorB(null);
     try {
-      const data = await fetchHistoricalData(ticker, sharedYears);
-      if (data.length === 0) throw new Error("No data");
-      setHistoryB(data);
+      const [stockData, exchangeData] = await Promise.all([
+        fetchHistoricalData(ticker, sharedYears),
+        fetchHistoricalExchangeRates("USD", "THB", sharedYears),
+      ]);
+      if (stockData.length === 0) throw new Error("No data");
+
+      const thbData = stockData.map((p) => {
+        const yearMonth = p.date.substring(0, 7);
+        const matchedRate = exchangeData.find(
+          (r) => r.date.substring(0, 7) === yearMonth,
+        );
+        const rate = matchedRate ? matchedRate.price : 34.0;
+        return { timestamp: p.timestamp, date: p.date, price: p.price * rate };
+      });
+
+      setHistoryB(thbData);
       setTickerB(ticker);
     } catch (err) {
       setErrorB(err instanceof Error ? err.message : "Failed");

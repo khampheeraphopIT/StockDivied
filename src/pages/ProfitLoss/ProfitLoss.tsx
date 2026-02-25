@@ -5,7 +5,10 @@ import { useI18n } from "@/i18n";
 import { InputField } from "@/components/ui/Input/Input";
 import { Button } from "@/components/ui/Button/Button";
 import { StockSelector } from "@/components/ui/StockSelector/StockSelector";
-import { fetchCurrentQuote } from "@/services/stockApi";
+import {
+  fetchCurrentQuote,
+  fetchCurrentExchangeRate,
+} from "@/services/stockApi";
 import { calculateProfitLoss } from "@/utils/calculators";
 import { formatCurrency, formatPercent } from "@/utils/formatters";
 
@@ -25,8 +28,11 @@ export function ProfitLossPage() {
     setIsLoading(true);
     setError(null);
     try {
-      const quote = await fetchCurrentQuote(ticker);
-      setSellPrice(quote.price);
+      const [quote, rate] = await Promise.all([
+        fetchCurrentQuote(ticker),
+        fetchCurrentExchangeRate("USD", "THB"),
+      ]);
+      setSellPrice(quote.price * rate);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Failed to fetch stock data",

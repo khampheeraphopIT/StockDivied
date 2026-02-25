@@ -5,7 +5,10 @@ import { useI18n } from "@/i18n";
 import { InputField } from "@/components/ui/Input/Input";
 import { Button } from "@/components/ui/Button/Button";
 import { StockSelector } from "@/components/ui/StockSelector/StockSelector";
-import { fetchHistoricalData } from "@/services/stockApi";
+import {
+  fetchHistoricalData,
+  fetchHistoricalExchangeRates,
+} from "@/services/stockApi";
 import {
   calculateDCA,
   calculateRealDCA,
@@ -46,10 +49,31 @@ export function DCASimulatorPage() {
     setIsLoading(true);
     setError(null);
     try {
-      const data = await fetchHistoricalData(ticker, years);
-      if (data.length === 0)
+      // Fetch both stock history and exchange rate history simultaneously
+      const [stockData, exchangeData] = await Promise.all([
+        fetchHistoricalData(ticker, years),
+        fetchHistoricalExchangeRates("USD", "THB", years),
+      ]);
+
+      if (stockData.length === 0)
         throw new Error("No data found for this timeframe");
-      setHistoricalPrices(data);
+
+      // Map USD prices to THB by matching the Year-Month
+      const thbData = stockData.map((p) => {
+        const yearMonth = p.date.substring(0, 7);
+        const matchedRate = exchangeData.find(
+          (r) => r.date.substring(0, 7) === yearMonth,
+        );
+        const rate = matchedRate ? matchedRate.price : 34.0; // Fallback to 34 THB if missing
+
+        return {
+          timestamp: p.timestamp,
+          date: p.date,
+          price: p.price * rate,
+        };
+      });
+
+      setHistoricalPrices(thbData);
       setSelectedTicker(ticker);
     } catch (err) {
       setError(

@@ -5,7 +5,10 @@ import { useI18n } from "@/i18n";
 import { InputField } from "@/components/ui/Input/Input";
 import { Button } from "@/components/ui/Button/Button";
 import { StockSelector } from "@/components/ui/StockSelector/StockSelector";
-import { fetchCurrentQuote } from "@/services/stockApi";
+import {
+  fetchCurrentQuote,
+  fetchCurrentExchangeRate,
+} from "@/services/stockApi";
 import { calculatePERatio } from "@/utils/calculators";
 import { formatNumber, formatCurrency } from "@/utils/formatters";
 
@@ -24,9 +27,12 @@ export function PERatioPage() {
     setIsLoading(true);
     setError(null);
     try {
-      const quote = await fetchCurrentQuote(ticker);
-      setStockPrice(quote.price);
-      if (quote.eps) setEps(quote.eps);
+      const [quote, rate] = await Promise.all([
+        fetchCurrentQuote(ticker),
+        fetchCurrentExchangeRate("USD", "THB"),
+      ]);
+      setStockPrice(quote.price * rate);
+      if (quote.eps) setEps(quote.eps * rate);
       // P/E ratio is derived from price / eps, but we don't automatically override industry PE
     } catch (err) {
       setError(

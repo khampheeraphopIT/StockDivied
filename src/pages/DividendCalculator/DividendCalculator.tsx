@@ -5,7 +5,10 @@ import { Button } from "@/components/ui/Button/Button";
 import { InputIcon } from "@/components/icons/InputIcon";
 import { ChartBarIcon } from "@/components/icons/ChartBarIcon";
 import { StockSelector } from "@/components/ui/StockSelector/StockSelector";
-import { fetchCurrentQuote } from "@/services/stockApi";
+import {
+  fetchCurrentQuote,
+  fetchCurrentExchangeRate,
+} from "@/services/stockApi";
 import { calculateDividend } from "@/utils/calculators";
 import { formatCurrency, formatPercent } from "@/utils/formatters";
 
@@ -25,12 +28,16 @@ export function DividendCalculatorPage() {
     setIsLoading(true);
     setError(null);
     try {
-      const quote = await fetchCurrentQuote(ticker);
-      setSharePrice(quote.price);
+      const [quote, rate] = await Promise.all([
+        fetchCurrentQuote(ticker),
+        fetchCurrentExchangeRate("USD", "THB"),
+      ]);
+
+      setSharePrice(quote.price * rate);
       if (quote.dividendRate !== null) {
-        setAnnualDividend(quote.dividendRate);
+        setAnnualDividend(quote.dividendRate * rate);
       } else if (quote.dividendYield !== null) {
-        setAnnualDividend((quote.dividendYield / 100) * quote.price);
+        setAnnualDividend((quote.dividendYield / 100) * quote.price * rate);
       } else {
         setAnnualDividend(0);
       }

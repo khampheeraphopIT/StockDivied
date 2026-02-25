@@ -19,6 +19,53 @@ export interface HistoricalDataPoint {
 }
 
 /**
+ * Fetch the current USD to THB exchange rate
+ */
+export const fetchCurrentExchangeRate = async (
+  from = "USD",
+  to = "THB",
+): Promise<number> => {
+  const ticker = `${from}${to}=X`;
+  try {
+    if (isDev) {
+      const res = await fetch(`/api/stock?type=quote&ticker=${ticker}`);
+      if (!res.ok) throw new Error("Local proxy failed");
+      const result = await res.json();
+      return result.regularMarketPrice || result.preMarketPrice || 0;
+    }
+
+    const url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${ticker}`;
+    const proxyUrl = `${ALLORIGINS_PROXY}${encodeURIComponent(url)}`;
+    const res = await fetch(proxyUrl);
+    const data = await res.json();
+    const parsed = JSON.parse(data.contents);
+    const result = parsed?.quoteResponse?.result?.[0];
+    return result?.regularMarketPrice || 0;
+  } catch (err) {
+    console.error("Failed to fetch exchange rate", err);
+    return 1; // Fallback to 1 if it fails to prevent NaNs
+  }
+};
+
+/**
+ * Fetch historical exchange rates for exact month-to-month alignment
+ */
+export const fetchHistoricalExchangeRates = async (
+  from = "USD",
+  to = "THB",
+  years = 10,
+): Promise<HistoricalDataPoint[]> => {
+  const ticker = `${from}${to}=X`;
+  try {
+    // We can reuse the existing `fetchHistoricalData` logic
+    return await fetchHistoricalData(ticker, years);
+  } catch (err) {
+    console.error("Failed to fetch historical exchange rates", err);
+    return []; // Return empty array as fallback
+  }
+};
+
+/**
  * Fetch current quote and key statistics for a ticker
  */
 export const fetchCurrentQuote = async (
