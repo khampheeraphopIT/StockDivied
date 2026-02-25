@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { AdBanner } from "@/components/ui/AdBanner/AdBanner";
 import { InputIcon } from "@/components/icons/InputIcon";
 import { ChartBarIcon } from "@/components/icons/ChartBarIcon";
 import { useI18n } from "@/i18n";
@@ -92,6 +93,7 @@ export function LoanCalculatorPage() {
             </div>
           </div>
         </div>
+        <AdBanner />
       </div>
     </div>
   );

@@ -4,6 +4,7 @@ import { Navbar } from "./Navbar/Navbar";
 import { Sidebar } from "./Sidebar/Sidebar";
 import { Footer } from "./Footer/Footer";
 import { CookieConsent } from "../ui/CookieConsent/CookieConsent";
+import { AdBanner } from "../ui/AdBanner/AdBanner";
 import styles from "./Layout.module.css";
 
 export function Layout() {
@@ -21,6 +22,7 @@ export function Layout() {
         className={`${styles.layoutContent} ${!isHome ? styles.layoutContentWithSidebar : ""}`}
       >
         <Outlet />
+        <AdBanner />
       </main>
       <Footer />
       <CookieConsent />

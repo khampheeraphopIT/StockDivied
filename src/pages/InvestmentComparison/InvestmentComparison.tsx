@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { AdBanner } from "@/components/ui/AdBanner/AdBanner";
 import { useQuery } from "@tanstack/react-query";
 import { useI18n } from "@/i18n";
 import { InputField } from "@/components/ui/Input/Input";
@@ -439,6 +440,7 @@ export function InvestmentComparisonPage() {
             </>
           )}
         </div>
+        <AdBanner />
       </div>
     </div>
   );

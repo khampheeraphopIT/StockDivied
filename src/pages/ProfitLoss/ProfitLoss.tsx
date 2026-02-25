@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { AdBanner } from "@/components/ui/AdBanner/AdBanner";
 import { useQuery } from "@tanstack/react-query";
 import { InputIcon } from "@/components/icons/InputIcon";
 import { ChartBarIcon } from "@/components/icons/ChartBarIcon";
@@ -172,6 +173,7 @@ export function ProfitLossPage() {
             </div>
           </div>
         </div>
+        <AdBanner />
       </div>
     </div>
   );

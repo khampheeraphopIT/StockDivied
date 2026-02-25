@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { AdBanner } from "@/components/ui/AdBanner/AdBanner";
 import { useI18n } from "@/i18n";
 import { InputField } from "@/components/ui/Input/Input";
 import { SelectField } from "@/components/ui/Select/Select";
@@ -178,6 +179,7 @@ export function CompoundInterestPage() {
             </ResponsiveContainer>
           </div>
         </div>
+        <AdBanner />
       </div>
     </div>
   );
