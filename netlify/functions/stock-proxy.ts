@@ -132,7 +132,7 @@ export const handler: Handler = async (event) => {
     return { statusCode: 200, headers: CORS, body: "" };
   }
 
-  const { type, ticker, years, query } = event.queryStringParameters || {};
+  const { type, ticker, years } = event.queryStringParameters || {};
 
   try {
     let result: unknown;
@@ -172,9 +172,9 @@ export const handler: Handler = async (event) => {
       result = points;
 
       /* ── Search ── */
-    } else if (type === "search" && query) {
+    } else if (type === "search" && ticker) {
       const data = (await yahooFetch(
-        `https://query2.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(query)}&quotesCount=10&newsCount=0`,
+        `https://query2.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(ticker)}&quotesCount=10&newsCount=0`,
       )) as { quotes?: unknown[] };
       result = { quotes: data?.quotes ?? [] };
     } else {

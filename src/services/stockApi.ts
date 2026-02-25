@@ -130,7 +130,7 @@ export const searchStocks = async (query: string): Promise<SearchQuote[]> => {
 
   try {
     const result = await fetchStockData(
-      `type=search&query=${encodeURIComponent(query)}`,
+      `type=search&ticker=${encodeURIComponent(query)}`,
     );
     if (!result?.quotes) return [];
 

@@ -187,6 +187,10 @@ export function calculateDCA(
   const monthlyRate = annualReturn / 100 / 12;
   const yearlyData: DCAResult["yearlyData"] = [];
 
+  // Total money the investor plans to invest over the full period
+  const totalPlannedInvestment =
+    initialInvestment + monthlyInvestment * 12 * years;
+
   for (let y = 1; y <= years; y++) {
     const months = y * 12;
     const invested = initialInvestment + monthlyInvestment * 12 * y;
@@ -200,8 +204,9 @@ export function calculateDCA(
         : monthlyInvestment * months;
     const dcaValue = fvInitial + fvDCA;
 
-    // Lump Sum: grow only the initial investment (no monthly DCA)
-    const lumpSumValue = initialInvestment * Math.pow(1 + monthlyRate, months);
+    // Lump Sum: invest ALL planned money at the very start and let it grow
+    const lumpSumValue =
+      totalPlannedInvestment * Math.pow(1 + monthlyRate, months);
 
     yearlyData.push({
       year: y,
