@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { InputIcon } from "@/components/icons/InputIcon";
 import { ChartBarIcon } from "@/components/icons/ChartBarIcon";
@@ -6,16 +6,8 @@ import { useI18n } from "@/i18n";
 import { InputField } from "@/components/ui/Input/Input";
 import { Button } from "@/components/ui/Button/Button";
 import { StockSelector } from "@/components/ui/StockSelector/StockSelector";
-import {
-  fetchHistoricalData,
-  fetchHistoricalExchangeRates,
-} from "@/services/stockApi";
-import {
-  calculateDCA,
-  calculateRealDCA,
-  type DCAResult,
-  type RealDCAResult,
-} from "@/utils/calculators";
+import { fetchHistoricalData } from "@/services/stockApi";
+import { calculateDCA, type DCAResult } from "@/utils/calculators";
 import { formatCurrency, getCurrencySymbol } from "@/utils/formatters";
 import {
   AreaChart,
@@ -27,6 +19,24 @@ import {
   ResponsiveContainer,
   Legend,
 } from "recharts";
+
+/**
+ * Derive the CAGR (Compound Annual Growth Rate) from historical price data.
+ * Returns the annualized return as a percentage, e.g. 12.5 for 12.5%/year.
+ */
+function deriveCAGR(prices: { timestamp: number; price: number }[]): number {
+  if (prices.length < 2) return 0;
+  const firstPrice = prices[0].price;
+  const lastPrice = prices[prices.length - 1].price;
+  if (firstPrice <= 0) return 0;
+  const startDate = new Date(prices[0].timestamp);
+  const endDate = new Date(prices[prices.length - 1].timestamp);
+  const yearsElapsed =
+    (endDate.getTime() - startDate.getTime()) / (365.25 * 24 * 60 * 60 * 1000);
+  if (yearsElapsed <= 0) return 0;
+  const cagr = (Math.pow(lastPrice / firstPrice, 1 / yearsElapsed) - 1) * 100;
+  return cagr;
+}
 
 export function DCASimulatorPage() {
   const { t, locale, currency } = useI18n();
@@ -40,53 +50,40 @@ export function DCASimulatorPage() {
   const [initial, setInitial] = useState(50000);
 
   const [error, setError] = useState<string | null>(null);
-  const [historicalPrices, setHistoricalPrices] = useState<
-    { timestamp: number; price: number }[]
-  >([]);
   const [selectedTicker, setSelectedTicker] = useState<string | null>(null);
 
+  // Always fetch the maximum history to get the best CAGR estimate
   const {
     data: stockData,
     isFetching: loadingStock,
     error: stockError,
   } = useQuery({
-    queryKey: ["history", selectedTicker, years],
-    queryFn: () => fetchHistoricalData(selectedTicker!, years),
+    queryKey: ["history", selectedTicker, 30],
+    queryFn: () => fetchHistoricalData(selectedTicker!, 30),
     enabled: !!selectedTicker,
   });
-
-  const { data: exchangeData, isFetching: loadingExchange } = useQuery({
-    queryKey: ["exchangeHistory", "USD", "THB", years],
-    queryFn: () => fetchHistoricalExchangeRates("USD", "THB", years),
-  });
-
-  useEffect(() => {
-    if (stockData && exchangeData && stockData.length > 0) {
-      const convertedData = stockData.map((p) => {
-        const yearMonth = p.date.substring(0, 7);
-        const matchedRate = exchangeData.find(
-          (r) => r.date.substring(0, 7) === yearMonth,
-        );
-        const baseRate = matchedRate ? matchedRate.price : 34.0;
-        const finalRate = currency === "USD" ? 1 : baseRate;
-
-        return {
-          timestamp: p.timestamp,
-          date: p.date,
-          price: p.price * finalRate,
-        };
-      });
-      // eslint-disable-next-line
-      setHistoricalPrices(convertedData);
-    }
-  }, [stockData, exchangeData, currency, years]);
 
   const handleStockSelect = (ticker: string) => {
     setSelectedTicker(ticker);
     setError(null);
   };
 
-  const isLoading = loadingStock || loadingExchange;
+  // Derive CAGR from historical data
+  const derivedCAGR = useMemo(() => {
+    if (!stockData || stockData.length < 2) return 0;
+    return deriveCAGR(stockData);
+  }, [stockData]);
+
+  const dataYears = useMemo(() => {
+    if (!stockData || stockData.length < 2) return 0;
+    const startDate = new Date(stockData[0].timestamp);
+    const endDate = new Date(stockData[stockData.length - 1].timestamp);
+    return (
+      (endDate.getTime() - startDate.getTime()) / (365.25 * 24 * 60 * 60 * 1000)
+    );
+  }, [stockData]);
+
+  const isLoading = loadingStock;
   const displayError =
     error ||
     (stockData && stockData.length === 0
@@ -97,21 +94,18 @@ export function DCASimulatorPage() {
 
   const isReal = mode === "real";
 
-  const fixedResult = calculateDCA(
+  // In both modes, we use calculateDCA with:
+  // - Fixed mode: user-entered annualReturn
+  // - Real mode: derived CAGR from historical stock data
+  const effectiveReturn =
+    isReal && derivedCAGR > 0 ? derivedCAGR : annualReturn;
+
+  const result: DCAResult = calculateDCA(
     monthlyInvestment,
-    annualReturn,
+    effectiveReturn,
     years,
     initial,
   );
-  const realResult = calculateRealDCA(
-    monthlyInvestment,
-    initial,
-    historicalPrices,
-  );
-
-  // Use real result if in real mode and we have data, otherwise fallback (or show fixed)
-  const result: DCAResult | RealDCAResult =
-    isReal && historicalPrices.length > 0 ? realResult : fixedResult;
 
   const modeLabelFixed =
     locale === "th" ? "อิงผลตอบแทนคงที่ (%)" : "Fixed Return Rate (%)";
@@ -149,9 +143,6 @@ export function DCASimulatorPage() {
               variant={mode === "real" ? "primary" : "secondary"}
               onClick={() => {
                 setMode("real");
-                if (historicalPrices.length === 0 && selectedTicker) {
-                  handleStockSelect(selectedTicker); // Try fetch if switched back
-                }
               }}
               style={{ flex: 1 }}
             >
@@ -182,10 +173,6 @@ export function DCASimulatorPage() {
             onChange={(e) => {
               const y = Number(e.target.value);
               setYears(y);
-              if (isReal && selectedTicker) {
-                // Changing years requires refetching history
-                setHistoricalPrices([]);
-              }
             }}
             suffix={t.common.years}
             min={1}
@@ -203,8 +190,8 @@ export function DCASimulatorPage() {
               error={displayError}
               label={
                 locale === "th"
-                  ? `จำลองมูลค่าด้วยหุ้น (${years} ปี)`
-                  : `Simulate with Stock (${years} Yrs)`
+                  ? `เลือกหุ้นเพื่อดึงผลตอบแทนเฉลี่ย`
+                  : `Select Stock for Avg. Return`
               }
             />
           ) : (
@@ -227,7 +214,6 @@ export function DCASimulatorPage() {
                 setAnnualReturn(10);
                 setYears(10);
                 setInitial(50000);
-                setHistoricalPrices([]);
                 setSelectedTicker(null);
                 setError(null);
               }}
@@ -242,7 +228,7 @@ export function DCASimulatorPage() {
             <ChartBarIcon width={18} height={18} /> {t.common.results}
           </div>
 
-          {isReal && historicalPrices.length === 0 ? (
+          {isReal && !selectedTicker ? (
             <div
               style={{ padding: "2rem", textAlign: "center", color: "#94a3b8" }}
             >
@@ -252,26 +238,59 @@ export function DCASimulatorPage() {
             </div>
           ) : (
             <>
-              {isReal &&
-                historicalPrices.length > 0 &&
-                Math.ceil(historicalPrices.length / 12) < years && (
-                  <div
-                    style={{
-                      padding: "1rem",
-                      marginBottom: "1.5rem",
-                      backgroundColor: "rgba(234, 179, 8, 0.1)",
-                      border: "1px solid rgba(234, 179, 8, 0.2)",
-                      borderRadius: "8px",
-                      color: "#eab308",
-                      fontSize: "0.95rem",
-                      lineHeight: "1.5",
-                    }}
-                  >
-                    {locale === "th"
-                      ? `⚠️ ข้อจำกัดข้อมูล: หุ้น ${selectedTicker?.toUpperCase()} มีข้อมูลย้อนหลังเพียง ${Math.ceil(historicalPrices.length / 12)} ปี ระบบจึงคำนวณเงินลงทุนและมูลค่าของพอร์ตทั้งหมดตามระยะเวลาที่มีข้อมูลจริงจนถึงปัจจุบันเท่านั้น`
-                      : `⚠️ Data Limitation: ${selectedTicker?.toUpperCase()} only has ${Math.ceil(historicalPrices.length / 12)} years of historical data. The simulation is capped to available data.`}
-                  </div>
-                )}
+              {/* Show derived CAGR info when in real mode */}
+              {isReal && derivedCAGR > 0 && selectedTicker && (
+                <div
+                  style={{
+                    padding: "1rem",
+                    marginBottom: "1.5rem",
+                    backgroundColor: "rgba(6, 182, 212, 0.1)",
+                    border: "1px solid rgba(6, 182, 212, 0.25)",
+                    borderRadius: "8px",
+                    color: "#67e8f9",
+                    fontSize: "0.95rem",
+                    lineHeight: "1.6",
+                  }}
+                >
+                  {locale === "th" ? (
+                    <>
+                      📊 หุ้น <strong>{selectedTicker.toUpperCase()}</strong>{" "}
+                      มีข้อมูลย้อนหลัง{" "}
+                      <strong>{dataYears.toFixed(1)} ปี</strong> →
+                      ผลตอบแทนเฉลี่ยต่อปี (CAGR):{" "}
+                      <strong
+                        style={{
+                          color: derivedCAGR >= 0 ? "#4ade80" : "#f87171",
+                        }}
+                      >
+                        {derivedCAGR.toFixed(2)}%
+                      </strong>
+                      <br />
+                      ระบบนำ CAGR นี้ไปคำนวณการลงทุน DCA{" "}
+                      <strong>{years} ปีข้างหน้า</strong> ให้คุณ
+                    </>
+                  ) : (
+                    <>
+                      📊 <strong>{selectedTicker.toUpperCase()}</strong> has{" "}
+                      <strong>{dataYears.toFixed(1)} years</strong> of data →
+                      Average annual return (CAGR):{" "}
+                      <strong
+                        style={{
+                          color: derivedCAGR >= 0 ? "#4ade80" : "#f87171",
+                        }}
+                      >
+                        {derivedCAGR.toFixed(2)}%
+                      </strong>
+                      <br />
+                      Projecting DCA for the next <strong>
+                        {years} years
+                      </strong>{" "}
+                      using this return rate.
+                    </>
+                  )}
+                </div>
+              )}
+
               <div className="result-grid">
                 <div className="result-item">
                   <span className="label">{tt.totalInvested}</span>
@@ -281,10 +300,12 @@ export function DCASimulatorPage() {
                 </div>
                 <div className="result-item">
                   <span className="label">
-                    {tt.portfolioValue}
+                    {locale === "th"
+                      ? "มูลค่าพอร์ต (DCA)"
+                      : "Portfolio Value (DCA)"}
                     {isReal && selectedTicker
-                      ? ` (${selectedTicker.toUpperCase()})`
-                      : " (DCA)"}
+                      ? ` — ${selectedTicker.toUpperCase()}`
+                      : ""}
                   </span>
                   <span className="value positive">
                     {formatCurrency(result.portfolioValue, currency)}
@@ -299,7 +320,11 @@ export function DCASimulatorPage() {
                   </span>
                 </div>
                 <div className="result-item">
-                  <span className="label">{tt.vsLumpSum}</span>
+                  <span className="label">
+                    {locale === "th"
+                      ? "มูลค่าถ้าลงทุนก้อนเดียว (Lump Sum)"
+                      : "Lump Sum Value (All at once)"}
+                  </span>
                   <span className="value">
                     {formatCurrency(result.lumpSumValue, currency)}
                   </span>
@@ -352,7 +377,11 @@ export function DCASimulatorPage() {
                       stroke="#f59e0b"
                       fill="#f59e0b"
                       fillOpacity={0.15}
-                      name={tt.vsLumpSum}
+                      name={
+                        locale === "th"
+                          ? "ลงทุนก้อนเดียว (Lump Sum)"
+                          : "Lump Sum"
+                      }
                     />
                   </AreaChart>
                 </ResponsiveContainer>
