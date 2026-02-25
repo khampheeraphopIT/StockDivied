@@ -11,6 +11,7 @@ export interface TranslationKeys {
     home: string;
     calculators: string;
     tools: string;
+    guide: string;
   };
 
   // Home Page
@@ -175,6 +176,19 @@ export interface TranslationKeys {
       difference: string;
       winner: string;
     };
+  };
+
+  // Guide Page
+  guide: {
+    title: string;
+    subtitle: string;
+    sections: {
+      id: string;
+      title: string;
+      content: string;
+      formula?: string;
+      tip?: string;
+    }[];
   };
 
   // Footer

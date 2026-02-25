@@ -1,0 +1,170 @@
+import { useState } from "react";
+import { useI18n } from "@/i18n";
+import { InputField } from "@/components/ui/Input/Input";
+import { Button } from "@/components/ui/Button/Button";
+import { calculateDCA } from "@/utils/calculators";
+import { formatCurrency } from "@/utils/formatters";
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+} from "recharts";
+
+export function DCASimulatorPage() {
+  const { t } = useI18n();
+  const tt = t.tools.dcaSimulator;
+
+  const [monthlyInvestment, setMonthlyInvestment] = useState(5000);
+  const [annualReturn, setAnnualReturn] = useState(10);
+  const [years, setYears] = useState(15);
+  const [initial, setInitial] = useState(50000);
+
+  const result = calculateDCA(monthlyInvestment, annualReturn, years, initial);
+
+  return (
+    <div className="page-container animate-fade-in">
+      <h1 className="page-title">{tt.name}</h1>
+      <p className="page-description">{tt.desc}</p>
+
+      <div className="calculator-grid">
+        <div className="input-section">
+          <div className="section-title">📥 {t.common.input}</div>
+          <InputField
+            label={tt.monthlyInvestment}
+            type="number"
+            value={monthlyInvestment}
+            onChange={(e) => setMonthlyInvestment(Number(e.target.value))}
+            suffix="฿"
+            min={0}
+          />
+          <InputField
+            label={tt.annualReturn}
+            type="number"
+            value={annualReturn}
+            onChange={(e) => setAnnualReturn(Number(e.target.value))}
+            suffix="%"
+            min={0}
+            step={0.1}
+          />
+          <InputField
+            label={tt.years}
+            type="number"
+            value={years}
+            onChange={(e) => setYears(Number(e.target.value))}
+            suffix={t.common.years}
+            min={1}
+            max={50}
+          />
+          <InputField
+            label={tt.initialInvestment}
+            type="number"
+            value={initial}
+            onChange={(e) => setInitial(Number(e.target.value))}
+            suffix="฿"
+            min={0}
+          />
+          <div className="button-row">
+            <Button
+              variant="secondary"
+              onClick={() => {
+                setMonthlyInvestment(5000);
+                setAnnualReturn(10);
+                setYears(15);
+                setInitial(50000);
+              }}
+            >
+              {t.common.reset}
+            </Button>
+          </div>
+        </div>
+
+        <div className="result-section">
+          <div className="section-title">📊 {t.common.results}</div>
+          <div className="result-grid">
+            <div className="result-item">
+              <span className="label">{tt.totalInvested}</span>
+              <span className="value">
+                {formatCurrency(result.totalInvested)}
+              </span>
+            </div>
+            <div className="result-item">
+              <span className="label">{tt.portfolioValue} (DCA)</span>
+              <span className="value positive">
+                {formatCurrency(result.portfolioValue)}
+              </span>
+            </div>
+            <div className="result-item">
+              <span className="label">{tt.totalReturn}</span>
+              <span
+                className={`value ${result.totalReturn >= 0 ? "positive" : "negative"}`}
+              >
+                {formatCurrency(result.totalReturn)}
+              </span>
+            </div>
+            <div className="result-item">
+              <span className="label">{tt.vsLumpSum}</span>
+              <span className="value">
+                {formatCurrency(result.lumpSumValue)}
+              </span>
+            </div>
+          </div>
+
+          <div className="chart-container">
+            <ResponsiveContainer width="100%" height={300}>
+              <AreaChart data={result.yearlyData}>
+                <CartesianGrid
+                  strokeDasharray="3 3"
+                  stroke="rgba(255,255,255,0.05)"
+                />
+                <XAxis dataKey="year" stroke="#64748b" fontSize={12} />
+                <YAxis
+                  stroke="#64748b"
+                  fontSize={12}
+                  tickFormatter={(v: number) => `${(v / 1000000).toFixed(1)}M`}
+                />
+                <Tooltip
+                  contentStyle={{
+                    background: "#1e293b",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                    borderRadius: 8,
+                  }}
+                  formatter={(value) => formatCurrency(Number(value))}
+                />
+                <Legend />
+                <Area
+                  type="monotone"
+                  dataKey="invested"
+                  stroke="#64748b"
+                  fill="#64748b"
+                  fillOpacity={0.2}
+                  name={tt.totalInvested}
+                />
+                <Area
+                  type="monotone"
+                  dataKey="dca"
+                  stroke="#06b6d4"
+                  fill="#06b6d4"
+                  fillOpacity={0.3}
+                  name="DCA"
+                />
+                <Area
+                  type="monotone"
+                  dataKey="lumpSum"
+                  stroke="#f59e0b"
+                  fill="#f59e0b"
+                  fillOpacity={0.15}
+                  name={tt.vsLumpSum}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

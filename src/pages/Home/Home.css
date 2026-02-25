@@ -1,0 +1,122 @@
+.hero {
+  position: relative;
+  min-height: 55vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--space-3xl) var(--space-lg);
+  overflow: hidden;
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 40%, rgba(99, 102, 241, 0.18), transparent 70%),
+    radial-gradient(ellipse 60% 50% at 80% 60%, rgba(139, 92, 246, 0.12), transparent 60%);
+  z-index: 0;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  max-width: 700px;
+}
+
+.hero-title {
+  font-size: var(--font-size-hero);
+  font-weight: 800;
+  line-height: 1.15;
+  margin-bottom: var(--space-lg);
+  background: linear-gradient(135deg, #f1f5f9, #818cf8, #a78bfa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-subtitle {
+  font-size: var(--font-size-lg);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-2xl);
+  line-height: 1.7;
+}
+
+/* Tools Grid */
+.tools-section {
+  padding-bottom: var(--space-3xl);
+}
+
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-lg);
+}
+
+.tool-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.tool-card-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-xs);
+}
+
+.tool-card-name {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.tool-card-desc {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* Beginner */
+.beginner-section {
+  padding-bottom: var(--space-3xl);
+}
+
+.beginner-card {
+  text-align: center;
+  padding: var(--space-3xl);
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(139, 92, 246, 0.05));
+}
+
+.beginner-title {
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  margin-bottom: var(--space-md);
+  color: var(--text-primary);
+}
+
+.beginner-desc {
+  color: var(--text-secondary);
+  font-size: var(--font-size-md);
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .hero {
+    min-height: 40vh;
+    padding: var(--space-2xl) var(--space-md);
+  }
+
+  .hero-title {
+    font-size: var(--font-size-3xl);
+  }
+
+  .tools-grid {
+    grid-template-columns: 1fr;
+  }
+}

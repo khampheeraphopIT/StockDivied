@@ -1,0 +1,73 @@
+.guide-sections {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+.guide-card {
+  padding: var(--space-xl);
+}
+
+.guide-card-title {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: var(--space-md);
+}
+
+.guide-card-content {
+  font-size: var(--font-size-md);
+  color: var(--text-secondary);
+  line-height: 1.8;
+  margin-bottom: var(--space-md);
+}
+
+.guide-formula {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-md);
+}
+
+.guide-formula-label {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.guide-formula-code {
+  display: block;
+  background: rgba(99, 102, 241, 0.08);
+  border: 1px solid rgba(99, 102, 241, 0.15);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: var(--font-size-sm);
+  color: var(--accent-light);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.guide-tip {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  background: rgba(16, 185, 129, 0.06);
+  border: 1px solid rgba(16, 185, 129, 0.12);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.guide-tip-icon {
+  flex-shrink: 0;
+  font-size: var(--font-size-lg);
+}
+
+@media (max-width: 768px) {
+  .guide-card {
+    padding: var(--space-lg);
+  }
+}

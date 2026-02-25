@@ -9,6 +9,7 @@ export const en: TranslationKeys = {
     home: "Home",
     calculators: "Calculators",
     tools: "Tools",
+    guide: "Investment Guide",
   },
 
   home: {
@@ -172,6 +173,94 @@ export const en: TranslationKeys = {
       difference: "Difference",
       winner: "Better Option",
     },
+  },
+
+  guide: {
+    title: "Investment Guide",
+    subtitle:
+      "Learn the basics of each tool so you can invest with confidence.",
+    sections: [
+      {
+        id: "dividend",
+        title: "💰 What is Dividend Yield?",
+        content:
+          "Dividend Yield shows how much a company pays in dividends relative to its share price. A higher yield means more income per dollar invested. Investors seeking passive income often favor stocks with consistent, high dividend yields.",
+        formula:
+          "Dividend Yield = (Annual Dividend per Share ÷ Share Price) × 100",
+        tip: "A good Dividend Yield is typically 3-6%. Always check if the dividend has been paid consistently.",
+      },
+      {
+        id: "compound",
+        title: "📈 Compound Interest — The Power of Time",
+        content:
+          "Compound interest means you earn interest on your interest. Over time, this creates exponential growth. Albert Einstein reportedly called it the 8th wonder of the world. The earlier you start, the more powerful the effect.",
+        formula:
+          "FV = P × (1 + r/n)^(n×t) + PMT × [((1 + r/n)^(n×t) - 1) ÷ (r/n)]",
+        tip: "Start early, invest consistently — even small amounts. Time is compound interest's best friend.",
+      },
+      {
+        id: "pe",
+        title: "📊 P/E Ratio — Cheap or Expensive?",
+        content:
+          "The P/E Ratio measures how much you pay per dollar of earnings. A high P/E might mean the stock is overvalued; a low P/E could signal opportunity — or trouble. Always compare within the same industry.",
+        formula: "P/E = Share Price ÷ Earnings Per Share (EPS)",
+        tip: "Don't look at P/E alone — compare it to the industry average P/E.",
+      },
+      {
+        id: "cagr",
+        title: "🚀 CAGR — The True Growth Rate",
+        content:
+          "CAGR shows the smoothed annual return of an investment, as if it grew at a steady rate every year. It's the best way to compare investments with different time horizons.",
+        formula: "CAGR = (Ending Value ÷ Beginning Value)^(1/Years) - 1",
+        tip: "A CAGR above 15% is considered excellent for long-term investing.",
+      },
+      {
+        id: "position",
+        title: "🎯 Position Sizing — Managing Risk",
+        content:
+          "Position sizing determines how many shares to buy based on how much you're willing to lose. It uses your account size, risk tolerance, and the distance between your entry price and stop loss.",
+        formula: "Shares = (Account × Risk%) ÷ (Entry Price - Stop Loss)",
+        tip: "General rule: never risk more than 1-2% of your portfolio on a single trade.",
+      },
+      {
+        id: "profitloss",
+        title: "💹 Profit & Loss Calculation",
+        content:
+          "Always include commissions and fees when calculating your real profit. ROI (Return on Investment) expresses your gain as a percentage, making it easy to compare trades.",
+        formula: "ROI = ((Sell - Buy) × Qty - Fees) ÷ (Buy × Qty) × 100",
+        tip: "Don't forget to account for both buy and sell commissions.",
+      },
+      {
+        id: "dca",
+        title: "🔄 DCA — Consistent Investing, Lower Risk",
+        content:
+          "Dollar-Cost Averaging means investing a fixed amount regularly, regardless of price. It removes the stress of market timing and averages your cost basis over time.",
+        tip: "DCA works best in volatile markets. In sustained bull markets, lump-sum investing may outperform.",
+      },
+      {
+        id: "loan",
+        title: "🏦 Loans — How Much Will You Really Pay?",
+        content:
+          "A loan calculator shows your monthly payment and total interest over the loan term. Understanding total cost helps decide between shorter or longer repayment periods.",
+        formula: "M = P × [r(1+r)^n] ÷ [(1+r)^n - 1]",
+        tip: "A shorter loan term means higher monthly payments but significantly less total interest.",
+      },
+      {
+        id: "breakeven",
+        title: "⚖️ Break-Even — When Do You Start Profiting?",
+        content:
+          "The break-even point is the number of units you must sell to cover all costs. Beyond this, every sale is profit. Margin of Safety shows how far your current sales exceed break-even.",
+        formula: "BEP = Fixed Costs ÷ (Price - Variable Cost)",
+        tip: "A higher Margin of Safety means a safer business. If negative, you're operating at a loss.",
+      },
+      {
+        id: "compare",
+        title: "🔀 Comparing Investments",
+        content:
+          "Comparing two investment options side-by-side helps you choose the best path for your money. Look at final value, growth rate, and time horizon together.",
+        tip: "Beyond returns, consider risk, liquidity, and tax implications.",
+      },
+    ],
   },
 
   footer: {

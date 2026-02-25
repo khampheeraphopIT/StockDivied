@@ -1,0 +1,90 @@
+import { useState } from "react";
+import { useI18n } from "@/i18n";
+import { InputField } from "@/components/ui/Input/Input";
+import { Button } from "@/components/ui/Button/Button";
+import { calculateLoan } from "@/utils/calculators";
+import { formatCurrency } from "@/utils/formatters";
+
+export function LoanCalculatorPage() {
+  const { t } = useI18n();
+  const tt = t.tools.loanCalc;
+
+  const [loanAmount, setLoanAmount] = useState(3000000);
+  const [annualRate, setAnnualRate] = useState(6.5);
+  const [loanTerm, setLoanTerm] = useState(30);
+
+  const result = calculateLoan(loanAmount, annualRate, loanTerm);
+
+  return (
+    <div className="page-container animate-fade-in">
+      <h1 className="page-title">{tt.name}</h1>
+      <p className="page-description">{tt.desc}</p>
+
+      <div className="calculator-grid">
+        <div className="input-section">
+          <div className="section-title">📥 {t.common.input}</div>
+          <InputField
+            label={tt.loanAmount}
+            type="number"
+            value={loanAmount}
+            onChange={(e) => setLoanAmount(Number(e.target.value))}
+            suffix="฿"
+            min={0}
+          />
+          <InputField
+            label={tt.annualRate}
+            type="number"
+            value={annualRate}
+            onChange={(e) => setAnnualRate(Number(e.target.value))}
+            suffix="%"
+            min={0}
+            step={0.1}
+          />
+          <InputField
+            label={tt.loanTerm}
+            type="number"
+            value={loanTerm}
+            onChange={(e) => setLoanTerm(Number(e.target.value))}
+            suffix={t.common.years}
+            min={1}
+            max={50}
+          />
+          <div className="button-row">
+            <Button
+              variant="secondary"
+              onClick={() => {
+                setLoanAmount(3000000);
+                setAnnualRate(6.5);
+                setLoanTerm(30);
+              }}
+            >
+              {t.common.reset}
+            </Button>
+          </div>
+        </div>
+
+        <div className="result-section">
+          <div className="section-title">📊 {t.common.results}</div>
+          <div className="result-grid">
+            <div className="result-item">
+              <span className="label">{tt.monthlyPayment}</span>
+              <span className="value">
+                {formatCurrency(result.monthlyPayment)}
+              </span>
+            </div>
+            <div className="result-item">
+              <span className="label">{tt.totalInterest}</span>
+              <span className="value negative">
+                {formatCurrency(result.totalInterest)}
+              </span>
+            </div>
+            <div className="result-item">
+              <span className="label">{tt.totalPaid}</span>
+              <span className="value">{formatCurrency(result.totalPaid)}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -1,33 +1,17 @@
-import {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  type ReactNode,
-} from "react";
-import type { Locale, TranslationKeys } from "./types";
+import { useState, useEffect } from "react";
+import type { ReactNode } from "react";
+import type { Locale } from "./types";
 import { th } from "./th";
 import { en } from "./en";
+import { I18nContext } from "./I18nContext";
 
-const translations: Record<Locale, TranslationKeys> = { th, en };
+const translations = { th, en } as const;
 
 function detectLocale(): Locale {
   const saved = localStorage.getItem("stockdived-locale") as Locale | null;
   if (saved && translations[saved]) return saved;
-
-  const browserLang = navigator.language || "";
-  if (browserLang.startsWith("th")) return "th";
-  return "en";
+  return "th";
 }
-
-interface I18nContextType {
-  locale: Locale;
-  t: TranslationKeys;
-  setLocale: (locale: Locale) => void;
-  toggleLocale: () => void;
-}
-
-const I18nContext = createContext<I18nContextType | null>(null);
 
 export function I18nProvider({ children }: { children: ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>(detectLocale);
@@ -53,10 +37,4 @@ export function I18nProvider({ children }: { children: ReactNode }) {
       {children}
     </I18nContext.Provider>
   );
-}
-
-export function useI18n(): I18nContextType {
-  const ctx = useContext(I18nContext);
-  if (!ctx) throw new Error("useI18n must be used within I18nProvider");
-  return ctx;
 }
