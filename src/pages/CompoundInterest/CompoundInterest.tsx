@@ -3,6 +3,8 @@ import { useI18n } from "@/i18n";
 import { InputField } from "@/components/ui/Input/Input";
 import { SelectField } from "@/components/ui/Select/Select";
 import { Button } from "@/components/ui/Button/Button";
+import { InputIcon } from "@/components/icons/InputIcon";
+import { ChartBarIcon } from "@/components/icons/ChartBarIcon";
 import { calculateCompoundInterest } from "@/utils/calculators";
 import { formatCurrency } from "@/utils/formatters";
 import {
@@ -48,7 +50,9 @@ export function CompoundInterestPage() {
 
       <div className="calculator-grid">
         <div className="input-section">
-          <div className="section-title">📥 {t.common.input}</div>
+          <div className="section-title">
+            <InputIcon width={18} height={18} /> {t.common.input}
+          </div>
           <InputField
             label={tt.principal}
             type="number"
@@ -106,7 +110,9 @@ export function CompoundInterestPage() {
         </div>
 
         <div className="result-section">
-          <div className="section-title">📊 {t.common.results}</div>
+          <div className="section-title">
+            <ChartBarIcon width={18} height={18} /> {t.common.results}
+          </div>
           <div className="result-grid">
             <div className="result-item">
               <span className="label">{tt.futureValue}</span>

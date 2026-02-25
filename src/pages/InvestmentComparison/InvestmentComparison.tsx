@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useI18n } from "@/i18n";
 import { InputField } from "@/components/ui/Input/Input";
 import { Button } from "@/components/ui/Button/Button";
+import { ChartBarIcon } from "@/components/icons/ChartBarIcon";
 import { calculateComparison } from "@/utils/calculators";
 import { formatCurrency } from "@/utils/formatters";
 import {
@@ -48,7 +49,7 @@ export function InvestmentComparisonPage() {
 
       <div className="calculator-grid">
         <div className="input-section">
-          <div className="section-title">🅰️ {tt.investmentA}</div>
+          <div className="section-title">{tt.investmentA}</div>
           <InputField
             label={tt.amount}
             type="number"
@@ -80,7 +81,7 @@ export function InvestmentComparisonPage() {
             className="section-title"
             style={{ marginTop: "var(--space-lg)" }}
           >
-            🅱️ {tt.investmentB}
+            {tt.investmentB}
           </div>
           <InputField
             label={tt.amount}
@@ -127,7 +128,9 @@ export function InvestmentComparisonPage() {
         </div>
 
         <div className="result-section">
-          <div className="section-title">📊 {t.common.results}</div>
+          <div className="section-title">
+            <ChartBarIcon width={18} height={18} /> {t.common.results}
+          </div>
           <div className="result-grid">
             <div className="result-item">
               <span className="label">

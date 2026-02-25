@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useI18n } from "@/i18n";
 import { InputField } from "@/components/ui/Input/Input";
 import { Button } from "@/components/ui/Button/Button";
+import { InputIcon } from "@/components/icons/InputIcon";
+import { ChartBarIcon } from "@/components/icons/ChartBarIcon";
 import { calculateDividend } from "@/utils/calculators";
 import { formatCurrency, formatPercent } from "@/utils/formatters";
 
@@ -35,7 +37,9 @@ export function DividendCalculatorPage() {
 
       <div className="calculator-grid">
         <div className="input-section">
-          <div className="section-title">📥 {t.common.input}</div>
+          <div className="section-title">
+            <InputIcon width={18} height={18} /> {t.common.input}
+          </div>
           <InputField
             label={tt.sharePrice}
             type="number"
@@ -78,7 +82,9 @@ export function DividendCalculatorPage() {
         </div>
 
         <div className="result-section">
-          <div className="section-title">📊 {t.common.results}</div>
+          <div className="section-title">
+            <ChartBarIcon width={18} height={18} /> {t.common.results}
+          </div>
           <div className="result-grid">
             <div className="result-item">
               <span className="label">{tt.dividendYield}</span>

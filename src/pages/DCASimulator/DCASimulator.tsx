@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { InputIcon } from "@/components/icons/InputIcon";
+import { ChartBarIcon } from "@/components/icons/ChartBarIcon";
 import { useI18n } from "@/i18n";
 import { InputField } from "@/components/ui/Input/Input";
 import { Button } from "@/components/ui/Button/Button";
@@ -33,7 +35,7 @@ export function DCASimulatorPage() {
 
       <div className="calculator-grid">
         <div className="input-section">
-          <div className="section-title">📥 {t.common.input}</div>
+          <div className="section-title"><InputIcon width={18} height={18} /> {t.common.input}</div>
           <InputField
             label={tt.monthlyInvestment}
             type="number"
@@ -84,7 +86,7 @@ export function DCASimulatorPage() {
         </div>
 
         <div className="result-section">
-          <div className="section-title">📊 {t.common.results}</div>
+          <div className="section-title"><ChartBarIcon width={18} height={18} /> {t.common.results}</div>
           <div className="result-grid">
             <div className="result-item">
               <span className="label">{tt.totalInvested}</span>
