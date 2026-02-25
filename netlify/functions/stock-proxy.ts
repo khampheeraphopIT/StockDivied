@@ -1,6 +1,47 @@
 import { Handler } from "@netlify/functions";
+import https from "https";
 
-export const handler: Handler = async (event, context) => {
+// Helper function to make HTTP GET requests using native Node.js https module
+const fetchHttps = (url: string): Promise<unknown> => {
+  return new Promise((resolve, reject) => {
+    https
+      .get(
+        url,
+        {
+          headers: {
+            "User-Agent":
+              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            Accept: "application/json",
+          },
+        },
+        (res) => {
+          if (
+            res.statusCode &&
+            (res.statusCode < 200 || res.statusCode >= 300)
+          ) {
+            reject(new Error(`Status: ${res.statusCode}`));
+            return;
+          }
+          let data = "";
+          res.on("data", (chunk) => {
+            data += chunk;
+          });
+          res.on("end", () => {
+            try {
+              resolve(JSON.parse(data));
+            } catch (e) {
+              reject(e);
+            }
+          });
+        },
+      )
+      .on("error", (err) => {
+        reject(err);
+      });
+  });
+};
+
+export const handler: Handler = async (event) => {
   const { type, ticker, years, query } = event.queryStringParameters || {};
 
   const headers = {
@@ -33,29 +74,20 @@ export const handler: Handler = async (event, context) => {
       };
     }
 
-    // Fetch from Yahoo Finance (Server-to-Server, no CORS restrictions)
-    const response = await fetch(url, {
-      headers: {
-        "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-      },
-    });
+    // Fetch from Yahoo Finance using native HTTPS
+    const data = await fetchHttps(url);
 
-    if (!response.ok) {
-      throw new Error(`Yahoo API returned ${response.status}`);
-    }
-
-    const data = await response.json();
+    const parsedData = data as any;
 
     // Map output to match frontend expectations
     let mappedData;
 
     if (type === "quote") {
-      mappedData = data?.quoteResponse?.result?.[0] || null;
+      mappedData = parsedData?.quoteResponse?.result?.[0] || null;
     } else if (type === "history") {
-      const timestamps = data?.chart?.result?.[0]?.timestamp || [];
+      const timestamps = parsedData?.chart?.result?.[0]?.timestamp || [];
       const closePrices =
-        data?.chart?.result?.[0]?.indicators?.quote?.[0]?.close || [];
+        parsedData?.chart?.result?.[0]?.indicators?.quote?.[0]?.close || [];
       const points = [];
       for (let i = 0; i < timestamps.length; i++) {
         if (closePrices[i] != null) {
@@ -68,7 +100,7 @@ export const handler: Handler = async (event, context) => {
       }
       mappedData = points;
     } else if (type === "search") {
-      mappedData = { quotes: data?.quotes || [] };
+      mappedData = { quotes: parsedData?.quotes || [] };
     }
 
     return {
