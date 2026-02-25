@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useI18n } from "@/i18n";
 import { InputField } from "@/components/ui/Input/Input";
 import { Button } from "@/components/ui/Button/Button";
@@ -25,19 +26,28 @@ export function DividendCalculatorPage() {
   const [sharesOwned, setSharesOwned] = useState(1000);
   const [taxRate, setTaxRate] = useState(10);
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [selectedTicker, setSelectedTicker] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const handleStockSelect = async (ticker: string) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const [quote, rate] = await Promise.all([
-        fetchCurrentQuote(ticker),
-        fetchCurrentExchangeRate("USD", "THB"),
-      ]);
-      const finalRate = currency === "USD" ? 1 : rate;
+  const {
+    data: quote,
+    isFetching: loadingQuote,
+    error: quoteError,
+  } = useQuery({
+    queryKey: ["quote", selectedTicker],
+    queryFn: () => fetchCurrentQuote(selectedTicker!),
+    enabled: !!selectedTicker,
+  });
 
+  const { data: exchangeRate, isFetching: loadingRate } = useQuery({
+    queryKey: ["exchangeRate", "USD", "THB"],
+    queryFn: () => fetchCurrentExchangeRate("USD", "THB"),
+  });
+
+  useEffect(() => {
+    if (quote && exchangeRate) {
+      const finalRate = currency === "USD" ? 1 : exchangeRate;
+      // eslint-disable-next-line
       setSharePrice(quote.price * finalRate);
       if (quote.dividendRate !== null) {
         setAnnualDividend(quote.dividendRate * finalRate);
@@ -48,14 +58,17 @@ export function DividendCalculatorPage() {
       } else {
         setAnnualDividend(0);
       }
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to fetch stock data",
-      );
-    } finally {
-      setIsLoading(false);
     }
+  }, [quote, exchangeRate, currency]); // Sync values when currency toggle changes
+
+  const handleStockSelect = (ticker: string) => {
+    setSelectedTicker(ticker);
+    setError(null);
   };
+
+  const isLoading = loadingQuote || loadingRate;
+  const displayError =
+    error || (quoteError ? (quoteError as Error).message : null);
 
   const result = calculateDividend(
     sharePrice,
@@ -86,7 +99,7 @@ export function DividendCalculatorPage() {
           <StockSelector
             onSelect={handleStockSelect}
             isLoading={isLoading}
-            error={error}
+            error={displayError}
           />
           <hr
             style={{ margin: "1rem 0", borderColor: "rgba(255,255,255,0.06)" }}

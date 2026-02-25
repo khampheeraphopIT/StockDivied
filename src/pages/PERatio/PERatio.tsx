@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { InputIcon } from "@/components/icons/InputIcon";
 import { ChartBarIcon } from "@/components/icons/ChartBarIcon";
 import { useI18n } from "@/i18n";
@@ -24,30 +25,41 @@ export function PERatioPage() {
   const [eps, setEps] = useState(10);
   const [industryPE, setIndustryPE] = useState(15);
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [selectedTicker, setSelectedTicker] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const handleStockSelect = async (ticker: string) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const [quote, rate] = await Promise.all([
-        fetchCurrentQuote(ticker),
-        fetchCurrentExchangeRate("USD", "THB"),
-      ]);
-      const finalRate = currency === "USD" ? 1 : rate;
+  const {
+    data: quote,
+    isFetching: loadingQuote,
+    error: quoteError,
+  } = useQuery({
+    queryKey: ["quote", selectedTicker],
+    queryFn: () => fetchCurrentQuote(selectedTicker!),
+    enabled: !!selectedTicker,
+  });
 
+  const { data: exchangeRate, isFetching: loadingRate } = useQuery({
+    queryKey: ["exchangeRate", "USD", "THB"],
+    queryFn: () => fetchCurrentExchangeRate("USD", "THB"),
+  });
+
+  useEffect(() => {
+    if (quote && exchangeRate) {
+      const finalRate = currency === "USD" ? 1 : exchangeRate;
+      // eslint-disable-next-line
       setStockPrice(quote.price * finalRate);
       if (quote.eps) setEps(quote.eps * finalRate);
-      // P/E ratio is derived from price / eps, but we don't automatically override industry PE
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to fetch stock data",
-      );
-    } finally {
-      setIsLoading(false);
     }
+  }, [quote, exchangeRate, currency]); // Auto-update
+
+  const handleStockSelect = (ticker: string) => {
+    setSelectedTicker(ticker);
+    setError(null);
   };
+
+  const isLoading = loadingQuote || loadingRate;
+  const displayError =
+    error || (quoteError ? (quoteError as Error).message : null);
 
   const result = calculatePERatio(stockPrice, eps, industryPE);
 
@@ -73,7 +85,7 @@ export function PERatioPage() {
           <StockSelector
             onSelect={handleStockSelect}
             isLoading={isLoading}
-            error={error}
+            error={displayError}
           />
           <hr
             style={{ margin: "1rem 0", borderColor: "rgba(255,255,255,0.06)" }}

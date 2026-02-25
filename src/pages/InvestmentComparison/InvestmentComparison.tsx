@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useI18n } from "@/i18n";
 import { InputField } from "@/components/ui/Input/Input";
 import { Button } from "@/components/ui/Button/Button";
@@ -48,85 +49,95 @@ export function InvestmentComparisonPage() {
   const [historyA, setHistoryA] = useState<
     { timestamp: number; price: number }[]
   >([]);
-  const [loadingA, setLoadingA] = useState(false);
   const [errorA, setErrorA] = useState<string | null>(null);
 
   const [tickerB, setTickerB] = useState<string | null>(null);
   const [historyB, setHistoryB] = useState<
     { timestamp: number; price: number }[]
   >([]);
-  const [loadingB, setLoadingB] = useState(false);
   const [errorB, setErrorB] = useState<string | null>(null);
 
-  const handleStockA = async (ticker: string) => {
-    setLoadingA(true);
+  const {
+    data: stockDataA,
+    isFetching: loadingFetchA,
+    error: stockErrorA,
+  } = useQuery({
+    queryKey: ["history", tickerA, sharedYears],
+    queryFn: () => fetchHistoricalData(tickerA!, sharedYears),
+    enabled: !!tickerA,
+  });
+
+  const {
+    data: stockDataB,
+    isFetching: loadingFetchB,
+    error: stockErrorB,
+  } = useQuery({
+    queryKey: ["history", tickerB, sharedYears],
+    queryFn: () => fetchHistoricalData(tickerB!, sharedYears),
+    enabled: !!tickerB,
+  });
+
+  const { data: exchangeHistory, isFetching: loadingExchange } = useQuery({
+    queryKey: ["exchangeHistory", "USD", "THB", sharedYears],
+    queryFn: () => fetchHistoricalExchangeRates("USD", "THB", sharedYears),
+  });
+
+  useEffect(() => {
+    if (stockDataA && exchangeHistory && stockDataA.length > 0) {
+      const convertedA = stockDataA.map((p) => {
+        const yearMonth = p.date.substring(0, 7);
+        const matchedRate = exchangeHistory.find(
+          (r) => r.date.substring(0, 7) === yearMonth,
+        );
+        const baseRate = matchedRate ? matchedRate.price : 34.0;
+        const finalRate = currency === "USD" ? 1 : baseRate;
+        return {
+          timestamp: p.timestamp,
+          date: p.date,
+          price: p.price * finalRate,
+        };
+      });
+      // eslint-disable-next-line
+      setHistoryA(convertedA);
+    }
+  }, [stockDataA, exchangeHistory, currency, sharedYears]);
+
+  useEffect(() => {
+    if (stockDataB && exchangeHistory && stockDataB.length > 0) {
+      const convertedB = stockDataB.map((p) => {
+        const yearMonth = p.date.substring(0, 7);
+        const matchedRate = exchangeHistory.find(
+          (r) => r.date.substring(0, 7) === yearMonth,
+        );
+        const baseRate = matchedRate ? matchedRate.price : 34.0;
+        const finalRate = currency === "USD" ? 1 : baseRate;
+        return {
+          timestamp: p.timestamp,
+          date: p.date,
+          price: p.price * finalRate,
+        };
+      });
+      // eslint-disable-next-line
+      setHistoryB(convertedB);
+    }
+  }, [stockDataB, exchangeHistory, currency, sharedYears]);
+
+  const handleStockA = (ticker: string) => {
+    setTickerA(ticker);
     setErrorA(null);
-    try {
-      const [stockData, exchangeData] = await Promise.all([
-        fetchHistoricalData(ticker, sharedYears),
-        fetchHistoricalExchangeRates("USD", "THB", sharedYears),
-      ]);
-      if (stockData.length === 0) throw new Error("No data");
-
-      const convertedData = stockData.map((p) => {
-        const yearMonth = p.date.substring(0, 7);
-        const matchedRate = exchangeData.find(
-          (r) => r.date.substring(0, 7) === yearMonth,
-        );
-        const baseRate = matchedRate ? matchedRate.price : 34.0;
-        const finalRate = currency === "USD" ? 1 : baseRate;
-        return {
-          timestamp: p.timestamp,
-          date: p.date,
-          price: p.price * finalRate,
-        };
-      });
-
-      setHistoryA(convertedData);
-      setTickerA(ticker);
-    } catch (err) {
-      setErrorA(err instanceof Error ? err.message : "Failed");
-      setHistoryA([]);
-      setTickerA(null);
-    } finally {
-      setLoadingA(false);
-    }
   };
 
-  const handleStockB = async (ticker: string) => {
-    setLoadingB(true);
+  const handleStockB = (ticker: string) => {
+    setTickerB(ticker);
     setErrorB(null);
-    try {
-      const [stockData, exchangeData] = await Promise.all([
-        fetchHistoricalData(ticker, sharedYears),
-        fetchHistoricalExchangeRates("USD", "THB", sharedYears),
-      ]);
-      if (stockData.length === 0) throw new Error("No data");
-
-      const convertedData = stockData.map((p) => {
-        const yearMonth = p.date.substring(0, 7);
-        const matchedRate = exchangeData.find(
-          (r) => r.date.substring(0, 7) === yearMonth,
-        );
-        const baseRate = matchedRate ? matchedRate.price : 34.0;
-        const finalRate = currency === "USD" ? 1 : baseRate;
-        return {
-          timestamp: p.timestamp,
-          date: p.date,
-          price: p.price * finalRate,
-        };
-      });
-
-      setHistoryB(convertedData);
-      setTickerB(ticker);
-    } catch (err) {
-      setErrorB(err instanceof Error ? err.message : "Failed");
-      setHistoryB([]);
-      setTickerB(null);
-    } finally {
-      setLoadingB(false);
-    }
   };
+
+  const loadingA = loadingFetchA || loadingExchange;
+  const loadingB = loadingFetchB || loadingExchange;
+  const displayErrorA =
+    errorA || (stockErrorA ? (stockErrorA as Error).message : null);
+  const displayErrorB =
+    errorB || (stockErrorB ? (stockErrorB as Error).message : null);
 
   const isReal = mode === "real";
 
@@ -236,7 +247,7 @@ export function InvestmentComparisonPage() {
             <StockSelector
               onSelect={handleStockA}
               isLoading={loadingA}
-              error={errorA}
+              error={displayErrorA}
               label={locale === "th" ? "หุ้น A (Ticker)" : "Stock A (Ticker)"}
             />
           ) : (
@@ -289,7 +300,7 @@ export function InvestmentComparisonPage() {
             <StockSelector
               onSelect={handleStockB}
               isLoading={loadingB}
-              error={errorB}
+              error={displayErrorB}
               label={locale === "th" ? "หุ้น B (Ticker)" : "Stock B (Ticker)"}
             />
           ) : (

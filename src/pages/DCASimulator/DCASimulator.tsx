@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { InputIcon } from "@/components/icons/InputIcon";
 import { ChartBarIcon } from "@/components/icons/ChartBarIcon";
 import { useI18n } from "@/i18n";
@@ -38,33 +39,35 @@ export function DCASimulatorPage() {
   const [years, setYears] = useState(10);
   const [initial, setInitial] = useState(50000);
 
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [historicalPrices, setHistoricalPrices] = useState<
     { timestamp: number; price: number }[]
   >([]);
   const [selectedTicker, setSelectedTicker] = useState<string | null>(null);
 
-  const handleStockSelect = async (ticker: string) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      // Fetch both stock history and exchange rate history simultaneously
-      const [stockData, exchangeData] = await Promise.all([
-        fetchHistoricalData(ticker, years),
-        fetchHistoricalExchangeRates("USD", "THB", years),
-      ]);
+  const {
+    data: stockData,
+    isFetching: loadingStock,
+    error: stockError,
+  } = useQuery({
+    queryKey: ["history", selectedTicker, years],
+    queryFn: () => fetchHistoricalData(selectedTicker!, years),
+    enabled: !!selectedTicker,
+  });
 
-      if (stockData.length === 0)
-        throw new Error("No data found for this timeframe");
+  const { data: exchangeData, isFetching: loadingExchange } = useQuery({
+    queryKey: ["exchangeHistory", "USD", "THB", years],
+    queryFn: () => fetchHistoricalExchangeRates("USD", "THB", years),
+  });
 
-      // Convert USD prices to target currency by matching the Year-Month
+  useEffect(() => {
+    if (stockData && exchangeData && stockData.length > 0) {
       const convertedData = stockData.map((p) => {
         const yearMonth = p.date.substring(0, 7);
         const matchedRate = exchangeData.find(
           (r) => r.date.substring(0, 7) === yearMonth,
         );
-        const baseRate = matchedRate ? matchedRate.price : 34.0; // Fallback to 34 THB if missing
+        const baseRate = matchedRate ? matchedRate.price : 34.0;
         const finalRate = currency === "USD" ? 1 : baseRate;
 
         return {
@@ -73,19 +76,24 @@ export function DCASimulatorPage() {
           price: p.price * finalRate,
         };
       });
-
+      // eslint-disable-next-line
       setHistoricalPrices(convertedData);
-      setSelectedTicker(ticker);
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to fetch historical data",
-      );
-      setHistoricalPrices([]);
-      setSelectedTicker(null);
-    } finally {
-      setIsLoading(false);
     }
+  }, [stockData, exchangeData, currency, years]);
+
+  const handleStockSelect = (ticker: string) => {
+    setSelectedTicker(ticker);
+    setError(null);
   };
+
+  const isLoading = loadingStock || loadingExchange;
+  const displayError =
+    error ||
+    (stockData && stockData.length === 0
+      ? "No data found for this timeframe"
+      : stockError
+        ? (stockError as Error).message
+        : null);
 
   const isReal = mode === "real";
 
@@ -192,7 +200,7 @@ export function DCASimulatorPage() {
             <StockSelector
               onSelect={handleStockSelect}
               isLoading={isLoading}
-              error={error}
+              error={displayError}
               label={
                 locale === "th"
                   ? `จำลองมูลค่าด้วยหุ้น (${years} ปี)`

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { InputIcon } from "@/components/icons/InputIcon";
 import { ChartBarIcon } from "@/components/icons/ChartBarIcon";
 import { useI18n } from "@/i18n";
@@ -25,20 +26,26 @@ export function CAGRPage() {
   const [endValue, setEndValue] = useState(250000);
   const [years, setYears] = useState(5);
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [selectedTicker, setSelectedTicker] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const handleStockSelect = async (ticker: string) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const [stockData, exchangeData] = await Promise.all([
-        fetchHistoricalData(ticker, years),
-        fetchHistoricalExchangeRates("USD", "THB", years),
-      ]);
-      if (stockData.length < 2)
-        throw new Error("Not enough historical data for this timeframe");
+  const {
+    data: stockData,
+    isFetching: loadingStock,
+    error: stockError,
+  } = useQuery({
+    queryKey: ["history", selectedTicker, years],
+    queryFn: () => fetchHistoricalData(selectedTicker!, years),
+    enabled: !!selectedTicker,
+  });
 
+  const { data: exchangeData, isFetching: loadingExchange } = useQuery({
+    queryKey: ["exchangeHistory", "USD", "THB", years],
+    queryFn: () => fetchHistoricalExchangeRates("USD", "THB", years),
+  });
+
+  useEffect(() => {
+    if (stockData && exchangeData && stockData.length >= 2) {
       const convertedData = stockData.map((p) => {
         const yearMonth = p.date.substring(0, 7);
         const matchedRate = exchangeData.find(
@@ -53,16 +60,25 @@ export function CAGRPage() {
         };
       });
 
+      // eslint-disable-next-line
       setBeginValue(convertedData[0].price);
       setEndValue(convertedData[convertedData.length - 1].price);
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to fetch historical data",
-      );
-    } finally {
-      setIsLoading(false);
     }
+  }, [stockData, exchangeData, currency, years]);
+
+  const handleStockSelect = (ticker: string) => {
+    setSelectedTicker(ticker);
+    setError(null);
   };
+
+  const isLoading = loadingStock || loadingExchange;
+  const displayError =
+    error ||
+    (stockData && stockData.length < 2
+      ? "Not enough historical data for this timeframe"
+      : stockError
+        ? (stockError as Error).message
+        : null);
 
   const result = calculateCAGR(beginValue, endValue, years);
 
@@ -80,7 +96,7 @@ export function CAGRPage() {
           <StockSelector
             onSelect={handleStockSelect}
             isLoading={isLoading}
-            error={error}
+            error={displayError}
             label={
               locale === "th"
                 ? `ดึงข้อมูลย้อนหลัง ${years} ปี (ใส่ Ticker)`
