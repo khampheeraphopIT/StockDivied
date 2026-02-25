@@ -99,6 +99,26 @@ export function Navbar({ onToggleSidebar }: { onToggleSidebar: () => void }) {
           </Link>
           <div className={styles.langSwitch}>
             <button
+              className={`${styles.langBtn} ${currency === "THB" ? styles.langBtnActive : ""}`}
+              onClick={() => {
+                setCurrency("THB");
+                setMenuOpen(false);
+              }}
+            >
+              THB
+            </button>
+            <button
+              className={`${styles.langBtn} ${currency === "USD" ? styles.langBtnActive : ""}`}
+              onClick={() => {
+                setCurrency("USD");
+                setMenuOpen(false);
+              }}
+            >
+              USD
+            </button>
+          </div>
+          <div className={styles.langSwitch}>
+            <button
               className={`${styles.langBtn} ${locale === "th" ? styles.langBtnActive : ""}`}
               onClick={() => {
                 setLocale("th");
