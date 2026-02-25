@@ -4,7 +4,7 @@ import { TOOL_ROUTES } from "@/routes/toolRoutes";
 import type { TranslationKeys } from "@/i18n/types";
 import { Card } from "@/components/ui/Card/Card";
 import { Button } from "@/components/ui/Button/Button";
-import "./Home.css";
+import styles from "./Home.module.css";
 
 function getToolName(t: TranslationKeys, toolId: string): string {
   const key = toolId as keyof TranslationKeys["tools"];
@@ -25,13 +25,13 @@ export function HomePage() {
   const navigate = useNavigate();
 
   return (
-    <div className="home">
+    <div>
       {/* Hero Section */}
-      <section className="hero">
-        <div className="hero-bg" />
-        <div className="hero-content animate-fade-in">
-          <h1 className="hero-title">{t.home.heroTitle}</h1>
-          <p className="hero-subtitle">{t.home.heroSubtitle}</p>
+      <section className={styles.hero}>
+        <div className={styles.heroBg} />
+        <div className={`${styles.heroContent} animate-fade-in`}>
+          <h1 className={styles.heroTitle}>{t.home.heroTitle}</h1>
+          <p className={styles.heroSubtitle}>{t.home.heroSubtitle}</p>
           <Button size="lg" onClick={() => navigate(TOOL_ROUTES[0].path)}>
             {t.home.getStarted}
           </Button>
@@ -39,27 +39,29 @@ export function HomePage() {
       </section>
 
       {/* Tools Grid */}
-      <section className="tools-section page-container">
+      <section className={`${styles.toolsSection} page-container`}>
         <h2 className="page-title">{t.home.toolsTitle}</h2>
         <p className="page-description">{t.home.toolsSubtitle}</p>
 
-        <div className="tools-grid">
+        <div className={styles.toolsGrid}>
           {TOOL_ROUTES.map((tool, i) => {
             const Icon = tool.icon;
             return (
               <Card
                 key={tool.id}
-                className={`tool-card animate-fade-in animate-fade-in-delay-${(i % 3) + 1}`}
+                className={`${styles.toolCard} animate-fade-in animate-fade-in-delay-${(i % 3) + 1}`}
                 onClick={() => navigate(tool.path)}
               >
                 <div
-                  className="tool-card-icon"
+                  className={styles.toolCardIcon}
                   style={{ background: `${tool.color}15`, color: tool.color }}
                 >
                   <Icon width={28} height={28} />
                 </div>
-                <h3 className="tool-card-name">{getToolName(t, tool.id)}</h3>
-                <p className="tool-card-desc">{getToolDesc(t, tool.id)}</p>
+                <h3 className={styles.toolCardName}>
+                  {getToolName(t, tool.id)}
+                </h3>
+                <p className={styles.toolCardDesc}>{getToolDesc(t, tool.id)}</p>
               </Card>
             );
           })}
@@ -67,10 +69,10 @@ export function HomePage() {
       </section>
 
       {/* Beginner Section */}
-      <section className="beginner-section page-container">
-        <Card className="beginner-card" glow>
-          <h2 className="beginner-title">{t.home.beginnerTitle}</h2>
-          <p className="beginner-desc">{t.home.beginnerDesc}</p>
+      <section className={`${styles.beginnerSection} page-container`}>
+        <Card className={styles.beginnerCard} glow>
+          <h2 className={styles.beginnerTitle}>{t.home.beginnerTitle}</h2>
+          <p className={styles.beginnerDesc}>{t.home.beginnerDesc}</p>
         </Card>
       </section>
     </div>

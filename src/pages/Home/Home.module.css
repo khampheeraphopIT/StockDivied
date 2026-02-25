@@ -5,11 +5,11 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: var(--space-3xl) var(--space-lg);
+  padding: 4rem 1.5rem;
   overflow: hidden;
 }
 
-.hero-bg {
+.heroBg {
   position: absolute;
   inset: 0;
   background:
@@ -18,90 +18,90 @@
   z-index: 0;
 }
 
-.hero-content {
+.heroContent {
   position: relative;
   z-index: 1;
   max-width: 700px;
 }
 
-.hero-title {
-  font-size: var(--font-size-hero);
+.heroTitle {
+  font-size: 3.5rem;
   font-weight: 800;
   line-height: 1.15;
-  margin-bottom: var(--space-lg);
+  margin-bottom: 1.5rem;
   background: linear-gradient(135deg, #f1f5f9, #818cf8, #a78bfa);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-.hero-subtitle {
-  font-size: var(--font-size-lg);
-  color: var(--text-secondary);
-  margin-bottom: var(--space-2xl);
+.heroSubtitle {
+  font-size: 1.125rem;
+  color: #94a3b8;
+  margin-bottom: 3rem;
   line-height: 1.7;
 }
 
 /* Tools Grid */
-.tools-section {
-  padding-bottom: var(--space-3xl);
+.toolsSection {
+  padding-bottom: 4rem;
 }
 
-.tools-grid {
+.toolsGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: var(--space-lg);
+  gap: 1.5rem;
 }
 
-.tool-card {
+.toolCard {
   display: flex;
   flex-direction: column;
-  gap: var(--space-sm);
+  gap: 0.5rem;
 }
 
-.tool-card-icon {
+.toolCardIcon {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 52px;
   height: 52px;
-  border-radius: var(--radius-md);
-  margin-bottom: var(--space-xs);
+  border-radius: 0.75rem;
+  margin-bottom: 0.25rem;
 }
 
-.tool-card-name {
-  font-size: var(--font-size-lg);
+.toolCardName {
+  font-size: 1.125rem;
   font-weight: 600;
-  color: var(--text-primary);
+  color: #f1f5f9;
 }
 
-.tool-card-desc {
-  font-size: var(--font-size-sm);
-  color: var(--text-secondary);
+.toolCardDesc {
+  font-size: 0.875rem;
+  color: #94a3b8;
   line-height: 1.6;
 }
 
 /* Beginner */
-.beginner-section {
-  padding-bottom: var(--space-3xl);
+.beginnerSection {
+  padding-bottom: 4rem;
 }
 
-.beginner-card {
+.beginnerCard {
   text-align: center;
-  padding: var(--space-3xl);
+  padding: 4rem;
   background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(139, 92, 246, 0.05));
 }
 
-.beginner-title {
-  font-size: var(--font-size-2xl);
+.beginnerTitle {
+  font-size: 1.5rem;
   font-weight: 700;
-  margin-bottom: var(--space-md);
-  color: var(--text-primary);
+  margin-bottom: 1rem;
+  color: #f1f5f9;
 }
 
-.beginner-desc {
-  color: var(--text-secondary);
-  font-size: var(--font-size-md);
+.beginnerDesc {
+  color: #94a3b8;
+  font-size: 1rem;
   max-width: 500px;
   margin: 0 auto;
 }
@@ -109,14 +109,14 @@
 @media (max-width: 768px) {
   .hero {
     min-height: 40vh;
-    padding: var(--space-2xl) var(--space-md);
+    padding: 3rem 1rem;
   }
 
-  .hero-title {
-    font-size: var(--font-size-3xl);
+  .heroTitle {
+    font-size: 2rem;
   }
 
-  .tools-grid {
+  .toolsGrid {
     grid-template-columns: 1fr;
   }
 }

@@ -1,0 +1,92 @@
+.guideSections {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.guideCard {
+  padding: 2rem;
+}
+
+.guideCardHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.guideCardIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 0.75rem;
+  flex-shrink: 0;
+}
+
+.guideCardTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #f1f5f9;
+}
+
+.guideCardContent {
+  font-size: 1rem;
+  color: #94a3b8;
+  line-height: 1.8;
+  margin-bottom: 1rem;
+}
+
+.guideFormula {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 1rem;
+}
+
+.guideFormulaLabel {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.guideFormulaCode {
+  display: block;
+  background: rgba(99, 102, 241, 0.08);
+  border: 1px solid rgba(99, 102, 241, 0.15);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.875rem;
+  color: #a78bfa;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.guideTip {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: rgba(16, 185, 129, 0.06);
+  border: 1px solid rgba(16, 185, 129, 0.12);
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  color: #94a3b8;
+  line-height: 1.6;
+}
+
+.guideTipIcon {
+  flex-shrink: 0;
+  color: #10b981;
+}
+
+@media (max-width: 768px) {
+  .guideCard {
+    padding: 1.5rem;
+  }
+}

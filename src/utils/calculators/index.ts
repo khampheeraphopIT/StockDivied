@@ -200,7 +200,8 @@ export function calculateDCA(
         : monthlyInvestment * months;
     const dcaValue = fvInitial + fvDCA;
 
-    const lumpSumValue = invested * Math.pow(1 + monthlyRate, months);
+    // Lump Sum: grow only the initial investment (no monthly DCA)
+    const lumpSumValue = initialInvestment * Math.pow(1 + monthlyRate, months);
 
     yearlyData.push({
       year: y,

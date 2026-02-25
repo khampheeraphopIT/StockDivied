@@ -1,6 +1,6 @@
 import { useI18n } from "@/i18n";
 import { BrandIcon } from "@/components/icons/BrandIcon";
-import "./Navbar.css";
+import styles from "./Navbar.module.css";
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
@@ -11,11 +11,11 @@ export function Navbar({ onToggleSidebar }: { onToggleSidebar: () => void }) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <nav className="navbar">
-      <div className="navbar-inner">
-        <div className="navbar-left">
+    <nav className={styles.navbar}>
+      <div className={styles.navbarInner}>
+        <div className={styles.navbarLeft}>
           <button
-            className="navbar-hamburger"
+            className={styles.navbarHamburger}
             onClick={onToggleSidebar}
             aria-label="Toggle menu"
           >
@@ -23,34 +23,34 @@ export function Navbar({ onToggleSidebar }: { onToggleSidebar: () => void }) {
             <span />
             <span />
           </button>
-          <Link to="/" className="navbar-brand">
-            <BrandIcon className="navbar-logo" />
-            <span className="navbar-name">{t.appName}</span>
+          <Link to="/" className={styles.navbarBrand}>
+            <BrandIcon className={styles.navbarLogo} />
+            <span className={styles.navbarName}>{t.appName}</span>
           </Link>
         </div>
 
-        <div className="navbar-right">
+        <div className={styles.navbarRight}>
           {!isHome && (
-            <Link to="/" className="navbar-link">
+            <Link to="/" className={styles.navbarLink}>
               {t.nav.home}
             </Link>
           )}
-          <Link to="/" className="navbar-link">
+          <Link to="/" className={styles.navbarLink}>
             {t.nav.tools}
           </Link>
-          <Link to="/guide" className="navbar-link">
+          <Link to="/guide" className={styles.navbarLink}>
             {t.nav.guide}
           </Link>
 
-          <div className="lang-switch" aria-label={t.common.language}>
+          <div className={styles.langSwitch} aria-label={t.common.language}>
             <button
-              className={`lang-btn ${locale === "th" ? "lang-btn-active" : ""}`}
+              className={`${styles.langBtn} ${locale === "th" ? styles.langBtnActive : ""}`}
               onClick={() => setLocale("th")}
             >
               TH
             </button>
             <button
-              className={`lang-btn ${locale === "en" ? "lang-btn-active" : ""}`}
+              className={`${styles.langBtn} ${locale === "en" ? styles.langBtnActive : ""}`}
               onClick={() => setLocale("en")}
             >
               EN
@@ -58,19 +58,19 @@ export function Navbar({ onToggleSidebar }: { onToggleSidebar: () => void }) {
           </div>
 
           <button
-            className="mobile-menu-btn"
+            className={styles.mobileMenuBtn}
             onClick={() => setMenuOpen(!menuOpen)}
             aria-label="Menu"
           >
-            <span className="hamburger-line" />
-            <span className="hamburger-line" />
-            <span className="hamburger-line" />
+            <span className={styles.hamburgerLine} />
+            <span className={styles.hamburgerLine} />
+            <span className={styles.hamburgerLine} />
           </button>
         </div>
       </div>
 
       {menuOpen && (
-        <div className="mobile-menu">
+        <div className={styles.mobileMenu}>
           <Link to="/" onClick={() => setMenuOpen(false)}>
             {t.nav.home}
           </Link>
@@ -80,9 +80,9 @@ export function Navbar({ onToggleSidebar }: { onToggleSidebar: () => void }) {
           <Link to="/guide" onClick={() => setMenuOpen(false)}>
             {t.nav.guide}
           </Link>
-          <div className="lang-switch">
+          <div className={styles.langSwitch}>
             <button
-              className={`lang-btn ${locale === "th" ? "lang-btn-active" : ""}`}
+              className={`${styles.langBtn} ${locale === "th" ? styles.langBtnActive : ""}`}
               onClick={() => {
                 setLocale("th");
                 setMenuOpen(false);
@@ -91,7 +91,7 @@ export function Navbar({ onToggleSidebar }: { onToggleSidebar: () => void }) {
               TH
             </button>
             <button
-              className={`lang-btn ${locale === "en" ? "lang-btn-active" : ""}`}
+              className={`${styles.langBtn} ${locale === "en" ? styles.langBtnActive : ""}`}
               onClick={() => {
                 setLocale("en");
                 setMenuOpen(false);

@@ -132,11 +132,11 @@ export const en: TranslationKeys = {
       monthlyInvestment: "Monthly Investment",
       annualReturn: "Annual Return (%)",
       years: "Duration (Years)",
-      initialInvestment: "Initial Lump Sum",
+      initialInvestment: "Initial Investment",
       totalInvested: "Total Invested",
       portfolioValue: "Portfolio Value",
       totalReturn: "Total Return",
-      vsLumpSum: "vs Lump Sum",
+      vsLumpSum: "Initial Growth (without DCA)",
     },
     loanCalc: {
       name: "Loan Calculator",

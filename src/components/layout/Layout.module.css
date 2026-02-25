@@ -1,0 +1,21 @@
+.layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.layoutContent {
+  flex: 1;
+  margin-top: 64px;
+  transition: margin-left 250ms ease;
+}
+
+.layoutContentWithSidebar {
+  margin-left: 280px;
+}
+
+@media (max-width: 768px) {
+  .layoutContentWithSidebar {
+    margin-left: 0;
+  }
+}

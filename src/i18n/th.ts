@@ -131,11 +131,11 @@ export const th: TranslationKeys = {
       monthlyInvestment: "เงินลงทุนต่อเดือน",
       annualReturn: "ผลตอบแทนต่อปี (%)",
       years: "ระยะเวลา (ปี)",
-      initialInvestment: "เงินลงทุนเริ่มต้น (ก้อนเดียว)",
+      initialInvestment: "เงินลงทุนเริ่มต้น",
       totalInvested: "เงินลงทุนรวม",
       portfolioValue: "มูลค่าพอร์ต",
       totalReturn: "ผลตอบแทนรวม",
-      vsLumpSum: "เทียบกับลงทุนก้อนเดียว",
+      vsLumpSum: "มูลค่าเงินก้อน (ถ้าไม่ DCA)",
     },
     loanCalc: {
       name: "คำนวณสินเชื่อ",
