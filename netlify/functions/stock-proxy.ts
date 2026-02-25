@@ -1,46 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Handler } from "@netlify/functions";
-import https from "https";
-
-// Helper function to make HTTP GET requests using native Node.js https module
-const fetchHttps = (url: string): Promise<unknown> => {
-  return new Promise((resolve, reject) => {
-    https
-      .get(
-        url,
-        {
-          headers: {
-            "User-Agent":
-              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-            Accept: "application/json",
-          },
-        },
-        (res) => {
-          if (
-            res.statusCode &&
-            (res.statusCode < 200 || res.statusCode >= 300)
-          ) {
-            reject(new Error(`Status: ${res.statusCode}`));
-            return;
-          }
-          let data = "";
-          res.on("data", (chunk) => {
-            data += chunk;
-          });
-          res.on("end", () => {
-            try {
-              resolve(JSON.parse(data));
-            } catch (e) {
-              reject(e);
-            }
-          });
-        },
-      )
-      .on("error", (err) => {
-        reject(err);
-      });
-  });
-};
+import yahooFinance from "yahoo-finance2";
 
 export const handler: Handler = async (event) => {
   const { type, ticker, years, query } = event.queryStringParameters || {};
@@ -57,51 +16,45 @@ export const handler: Handler = async (event) => {
   }
 
   try {
-    let url = "";
+    let mappedData;
 
     if (type === "quote" && ticker) {
-      url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${ticker}`;
+      // Fetch quote
+      const quote = await yahooFinance.quote(ticker);
+      mappedData = quote || null;
     } else if (type === "history" && ticker && years) {
-      url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?range=${years}y&interval=1mo`;
+      // Fetch historical data
+      const period1 = new Date();
+      period1.setFullYear(period1.getFullYear() - Number(years));
+
+      const queryOptions = {
+        period1: period1,
+        period2: new Date(),
+        interval: "1mo" as const,
+      };
+
+      const result = (await yahooFinance.historical(
+        ticker,
+        queryOptions,
+      )) as unknown as { date: Date; close: number }[];
+
+      mappedData = result.map((p: { date: Date; close: number }) => ({
+        date: p.date.toISOString().split("T")[0],
+        close: p.close,
+      }));
     } else if (type === "search" && query) {
-      url = `https://query2.finance.yahoo.com/v1/finance/search?q=${encodeURIComponent(
-        query,
-      )}&quotesCount=10&newsCount=0`;
+      // Fetch search
+      const result = (await yahooFinance.search(query, {
+        quotesCount: 10,
+        newsCount: 0,
+      })) as unknown as Record<string, unknown[]>;
+      mappedData = { quotes: result.quotes || [] };
     } else {
       return {
         statusCode: 400,
         headers,
         body: JSON.stringify({ error: "Invalid parameters" }),
       };
-    }
-
-    // Fetch from Yahoo Finance using native HTTPS
-    const data = await fetchHttps(url);
-
-    const parsedData = data as any;
-
-    // Map output to match frontend expectations
-    let mappedData;
-
-    if (type === "quote") {
-      mappedData = parsedData?.quoteResponse?.result?.[0] || null;
-    } else if (type === "history") {
-      const timestamps = parsedData?.chart?.result?.[0]?.timestamp || [];
-      const closePrices =
-        parsedData?.chart?.result?.[0]?.indicators?.quote?.[0]?.close || [];
-      const points = [];
-      for (let i = 0; i < timestamps.length; i++) {
-        if (closePrices[i] != null) {
-          const dateObj = new Date(timestamps[i] * 1000);
-          points.push({
-            date: dateObj.toISOString().split("T")[0],
-            close: closePrices[i],
-          });
-        }
-      }
-      mappedData = points;
-    } else if (type === "search") {
-      mappedData = { quotes: parsedData?.quotes || [] };
     }
 
     return {
@@ -114,7 +67,9 @@ export const handler: Handler = async (event) => {
     return {
       statusCode: 500,
       headers,
-      body: JSON.stringify({ error: "Failed fetching data" }),
+      body: JSON.stringify({
+        error: "Failed fetching data from Yahoo Finance",
+      }),
     };
   }
 };

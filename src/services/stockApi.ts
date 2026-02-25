@@ -87,15 +87,17 @@ export const fetchCurrentQuote = async (
 
   return {
     ticker: result.symbol,
-    price: result.regularMarketPrice || result.preMarketPrice || 0,
+    price:
+      result.regularMarketPrice || result.preMarketPrice || result.price || 0,
     currency: result.currency || "USD",
     name: result.shortName || result.longName || result.symbol,
     eps: result.epsTrailingTwelveMonths || null,
-    pe: result.trailingPE || null,
+    pe: result.trailingPE || result.forwardPE || null,
     dividendYield: result.trailingAnnualDividendYield
       ? result.trailingAnnualDividendYield * 100
-      : null,
-    dividendRate: result.trailingAnnualDividendRate || null,
+      : result.dividendYield || null,
+    dividendRate:
+      result.trailingAnnualDividendRate || result.dividendRate || null,
   };
 };
 
@@ -134,10 +136,10 @@ export const searchStocks = async (query: string): Promise<SearchQuote[]> => {
 
     return result.quotes.map((q: Record<string, unknown>) => ({
       symbol: String(q.symbol || ""),
-      shortname: String(q.shortname || q.longname || ""),
-      longname: String(q.longname || q.shortname || ""),
+      shortname: String(q.shortname || q.longname || q.symbol || ""),
+      longname: String(q.longname || q.shortname || q.symbol || ""),
       exchange: String(q.exchange || ""),
-      quoteType: String(q.quoteType || ""),
+      quoteType: String(q.quoteType || "EQUITY"),
       industry: String(q.industry || ""),
       sector: String(q.sector || ""),
     }));
