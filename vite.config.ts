@@ -41,11 +41,11 @@ const yahooFinancePlugin = () => ({
             const period1 = new Date();
             period1.setFullYear(period1.getFullYear() - years);
 
-            result = await yahooFinance.historical(ticker, {
+            const chartResult = await yahooFinance.chart(ticker, {
               period1: period1,
-              period2: new Date(),
               interval: "1mo",
             });
+            result = chartResult.quotes;
           } else {
             res.statusCode = 400;
             res.end(JSON.stringify({ error: "Invalid type" }));

@@ -285,7 +285,7 @@ export function DCASimulatorPage() {
                     />
                     <Area
                       type="monotone"
-                      dataKey={isReal ? "dcaValue" : "dca"}
+                      dataKey="dca"
                       stroke="#06b6d4"
                       fill="#06b6d4"
                       fillOpacity={0.3}
@@ -293,7 +293,7 @@ export function DCASimulatorPage() {
                     />
                     <Area
                       type="monotone"
-                      dataKey={isReal ? "lumpSumValue" : "lumpSum"}
+                      dataKey="lumpSum"
                       stroke="#f59e0b"
                       fill="#f59e0b"
                       fillOpacity={0.15}
