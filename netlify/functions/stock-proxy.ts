@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Handler } from "@netlify/functions";
 import https from "https";
 
