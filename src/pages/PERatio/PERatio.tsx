@@ -11,6 +11,7 @@ import {
   fetchCurrentQuote,
   fetchCurrentExchangeRate,
 } from "@/services/stockApi";
+import { getConversionRate } from "@/utils/currency";
 import { calculatePERatio } from "@/utils/calculators";
 import {
   formatNumber,
@@ -46,10 +47,14 @@ export function PERatioPage() {
 
   useEffect(() => {
     if (quote && exchangeRate) {
-      const finalRate = currency === "USD" ? 1 : exchangeRate;
+      const conversionRate = getConversionRate(
+        quote.currency,
+        currency,
+        exchangeRate,
+      );
       // eslint-disable-next-line
-      setStockPrice(quote.price * finalRate);
-      if (quote.eps) setEps(quote.eps * finalRate);
+      setStockPrice(quote.price * conversionRate);
+      if (quote.eps) setEps(quote.eps * conversionRate);
     }
   }, [quote, exchangeRate, currency]); // Auto-update
 

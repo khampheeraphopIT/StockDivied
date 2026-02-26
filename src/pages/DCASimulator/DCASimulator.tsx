@@ -7,7 +7,12 @@ import { useI18n } from "@/i18n";
 import { InputField } from "@/components/ui/Input/Input";
 import { Button } from "@/components/ui/Button/Button";
 import { StockSelector } from "@/components/ui/StockSelector/StockSelector";
-import { fetchHistoricalData } from "@/services/stockApi";
+import {
+  fetchHistoricalData,
+  fetchCurrentQuote,
+  fetchCurrentExchangeRate,
+} from "@/services/stockApi";
+import { getConversionRate } from "@/utils/currency";
 import { calculateDCA, type DCAResult } from "@/utils/calculators";
 import { formatCurrency, getCurrencySymbol } from "@/utils/formatters";
 import {
@@ -53,6 +58,12 @@ export function DCASimulatorPage() {
   const [error, setError] = useState<string | null>(null);
   const [selectedTicker, setSelectedTicker] = useState<string | null>(null);
 
+  const { data: quote } = useQuery({
+    queryKey: ["quote", selectedTicker],
+    queryFn: () => fetchCurrentQuote(selectedTicker!),
+    enabled: !!selectedTicker,
+  });
+
   // Always fetch the maximum history to get the best CAGR estimate
   const {
     data: stockData,
@@ -64,6 +75,11 @@ export function DCASimulatorPage() {
     enabled: !!selectedTicker,
   });
 
+  const { data: exchangeRate } = useQuery({
+    queryKey: ["exchangeRate", "USD", "THB"],
+    queryFn: () => fetchCurrentExchangeRate("USD", "THB"),
+  });
+
   const handleStockSelect = (ticker: string) => {
     setSelectedTicker(ticker);
     setError(null);
@@ -71,9 +87,22 @@ export function DCASimulatorPage() {
 
   // Derive CAGR from historical data
   const derivedCAGR = useMemo(() => {
-    if (!stockData || stockData.length < 2) return 0;
-    return deriveCAGR(stockData);
-  }, [stockData]);
+    if (!stockData || stockData.length < 2 || !quote || !exchangeRate) return 0;
+
+    // Convert first and last price to current selected currency before deriving CAGR
+    // This handles Thai stocks correctly (already in THB)
+    const conversionRate = getConversionRate(
+      quote.currency,
+      currency,
+      exchangeRate,
+    );
+    const convertedPrices = stockData.map((p) => ({
+      ...p,
+      price: p.price * conversionRate,
+    }));
+
+    return deriveCAGR(convertedPrices);
+  }, [stockData, quote, exchangeRate, currency]);
 
   const dataYears = useMemo(() => {
     if (!stockData || stockData.length < 2) return 0;

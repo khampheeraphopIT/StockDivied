@@ -11,6 +11,7 @@ import {
   fetchCurrentQuote,
   fetchCurrentExchangeRate,
 } from "@/services/stockApi";
+import { getConversionRate } from "@/utils/currency";
 import { calculatePositionSize } from "@/utils/calculators";
 import {
   formatCurrency,
@@ -47,8 +48,12 @@ export function PositionSizePage() {
 
   useEffect(() => {
     if (quote && exchangeRate) {
-      const finalRate = currency === "USD" ? 1 : exchangeRate;
-      const convertedPrice = quote.price * finalRate;
+      const conversionRate = getConversionRate(
+        quote.currency,
+        currency,
+        exchangeRate,
+      );
+      const convertedPrice = quote.price * conversionRate;
       // eslint-disable-next-line
       setEntryPrice(convertedPrice);
       // Auto-set stop loss to 5% below entry price as a starting point

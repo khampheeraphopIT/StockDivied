@@ -11,6 +11,7 @@ import {
   fetchCurrentQuote,
   fetchCurrentExchangeRate,
 } from "@/services/stockApi";
+import { getConversionRate } from "@/utils/currency";
 import { calculateProfitLoss } from "@/utils/calculators";
 import {
   formatCurrency,
@@ -47,9 +48,13 @@ export function ProfitLossPage() {
 
   useEffect(() => {
     if (quote && exchangeRate) {
-      const finalRate = currency === "USD" ? 1 : exchangeRate;
+      const conversionRate = getConversionRate(
+        quote.currency,
+        currency,
+        exchangeRate,
+      );
       // eslint-disable-next-line
-      setSellPrice(quote.price * finalRate);
+      setSellPrice(quote.price * conversionRate);
     }
   }, [quote, exchangeRate, currency]); // Sync values when currency toggle changes
 

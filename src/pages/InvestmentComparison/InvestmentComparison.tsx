@@ -7,9 +7,11 @@ import { Button } from "@/components/ui/Button/Button";
 import { ChartBarIcon } from "@/components/icons/ChartBarIcon";
 import { StockSelector } from "@/components/ui/StockSelector/StockSelector";
 import {
+  fetchCurrentQuote,
   fetchHistoricalData,
   fetchHistoricalExchangeRates,
 } from "@/services/stockApi";
+import { getConversionRate } from "@/utils/currency";
 import {
   calculateComparison,
   calculateRealComparison,
@@ -58,6 +60,18 @@ export function InvestmentComparisonPage() {
   >([]);
   const [errorB, setErrorB] = useState<string | null>(null);
 
+  const { data: quoteA } = useQuery({
+    queryKey: ["quote", tickerA],
+    queryFn: () => fetchCurrentQuote(tickerA!),
+    enabled: !!tickerA,
+  });
+
+  const { data: quoteB } = useQuery({
+    queryKey: ["quote", tickerB],
+    queryFn: () => fetchCurrentQuote(tickerB!),
+    enabled: !!tickerB,
+  });
+
   const {
     data: stockDataA,
     isFetching: loadingFetchA,
@@ -84,44 +98,52 @@ export function InvestmentComparisonPage() {
   });
 
   useEffect(() => {
-    if (stockDataA && exchangeHistory && stockDataA.length > 0) {
+    if (stockDataA && exchangeHistory && quoteA && stockDataA.length > 0) {
       const convertedA = stockDataA.map((p) => {
         const yearMonth = p.date.substring(0, 7);
         const matchedRate = exchangeHistory.find(
           (r) => r.date.substring(0, 7) === yearMonth,
         );
         const baseRate = matchedRate ? matchedRate.price : 34.0;
-        const finalRate = currency === "USD" ? 1 : baseRate;
+        const conversionRate = getConversionRate(
+          quoteA.currency,
+          currency,
+          baseRate,
+        );
         return {
           timestamp: p.timestamp,
           date: p.date,
-          price: p.price * finalRate,
+          price: p.price * conversionRate,
         };
       });
       // eslint-disable-next-line
       setHistoryA(convertedA);
     }
-  }, [stockDataA, exchangeHistory, currency, sharedYears]);
+  }, [stockDataA, exchangeHistory, quoteA, currency, sharedYears]);
 
   useEffect(() => {
-    if (stockDataB && exchangeHistory && stockDataB.length > 0) {
+    if (stockDataB && exchangeHistory && quoteB && stockDataB.length > 0) {
       const convertedB = stockDataB.map((p) => {
         const yearMonth = p.date.substring(0, 7);
         const matchedRate = exchangeHistory.find(
           (r) => r.date.substring(0, 7) === yearMonth,
         );
         const baseRate = matchedRate ? matchedRate.price : 34.0;
-        const finalRate = currency === "USD" ? 1 : baseRate;
+        const conversionRate = getConversionRate(
+          quoteB.currency,
+          currency,
+          baseRate,
+        );
         return {
           timestamp: p.timestamp,
           date: p.date,
-          price: p.price * finalRate,
+          price: p.price * conversionRate,
         };
       });
       // eslint-disable-next-line
       setHistoryB(convertedB);
     }
-  }, [stockDataB, exchangeHistory, currency, sharedYears]);
+  }, [stockDataB, exchangeHistory, quoteB, currency, sharedYears]);
 
   const handleStockA = (ticker: string) => {
     setTickerA(ticker);

@@ -11,6 +11,7 @@ import {
   fetchCurrentQuote,
   fetchCurrentExchangeRate,
 } from "@/services/stockApi";
+import { getConversionRate } from "@/utils/currency";
 import { calculateDividend } from "@/utils/calculators";
 import {
   formatCurrency,
@@ -47,14 +48,18 @@ export function DividendCalculatorPage() {
 
   useEffect(() => {
     if (quote && exchangeRate) {
-      const finalRate = currency === "USD" ? 1 : exchangeRate;
+      const conversionRate = getConversionRate(
+        quote.currency,
+        currency,
+        exchangeRate,
+      );
       // eslint-disable-next-line
-      setSharePrice(quote.price * finalRate);
+      setSharePrice(quote.price * conversionRate);
       if (quote.dividendRate !== null) {
-        setAnnualDividend(quote.dividendRate * finalRate);
+        setAnnualDividend(quote.dividendRate * conversionRate);
       } else if (quote.dividendYield !== null) {
         setAnnualDividend(
-          (quote.dividendYield / 100) * quote.price * finalRate,
+          (quote.dividendYield / 100) * quote.price * conversionRate,
         );
       } else {
         setAnnualDividend(0);

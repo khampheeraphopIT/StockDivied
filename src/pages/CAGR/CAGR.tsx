@@ -8,9 +8,11 @@ import { InputField } from "@/components/ui/Input/Input";
 import { Button } from "@/components/ui/Button/Button";
 import { StockSelector } from "@/components/ui/StockSelector/StockSelector";
 import {
+  fetchCurrentQuote,
   fetchHistoricalData,
   fetchHistoricalExchangeRates,
 } from "@/services/stockApi";
+import { getConversionRate } from "@/utils/currency";
 import { calculateCAGR } from "@/utils/calculators";
 import {
   formatCurrency,
@@ -30,6 +32,12 @@ export function CAGRPage() {
   const [selectedTicker, setSelectedTicker] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const { data: quote } = useQuery({
+    queryKey: ["quote", selectedTicker],
+    queryFn: () => fetchCurrentQuote(selectedTicker!),
+    enabled: !!selectedTicker,
+  });
+
   const {
     data: stockData,
     isFetching: loadingStock,
@@ -46,18 +54,23 @@ export function CAGRPage() {
   });
 
   useEffect(() => {
-    if (stockData && exchangeData && stockData.length >= 2) {
+    if (stockData && exchangeData && quote && stockData.length >= 2) {
       const convertedData = stockData.map((p) => {
         const yearMonth = p.date.substring(0, 7);
         const matchedRate = exchangeData.find(
           (r) => r.date.substring(0, 7) === yearMonth,
         );
         const baseRate = matchedRate ? matchedRate.price : 34.0;
-        const finalRate = currency === "USD" ? 1 : baseRate;
+        const conversionRate = getConversionRate(
+          quote.currency,
+          currency,
+          baseRate,
+        );
+
         return {
           timestamp: p.timestamp,
           date: p.date,
-          price: p.price * finalRate,
+          price: p.price * conversionRate,
         };
       });
 
@@ -65,7 +78,7 @@ export function CAGRPage() {
       setBeginValue(convertedData[0].price);
       setEndValue(convertedData[convertedData.length - 1].price);
     }
-  }, [stockData, exchangeData, currency, years]);
+  }, [stockData, exchangeData, quote, currency, years]);
 
   const handleStockSelect = (ticker: string) => {
     setSelectedTicker(ticker);
