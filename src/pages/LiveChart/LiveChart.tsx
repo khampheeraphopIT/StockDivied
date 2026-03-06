@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useId } from "react";
+import { useEffect, useId, useRef } from "react";
 import { useI18n } from "@/i18n";
 import { AdBanner } from "@/components/ui/AdBanner/AdBanner";
 import { SEOArticle } from "@/components/ui/SEOArticle/SEOArticle";
@@ -11,6 +11,8 @@ interface LiveChartProps {
 export function LiveChartPage({ isEmbedded = false }: LiveChartProps) {
   const { t, locale } = useI18n();
   const tt = t.tools.liveChart;
+
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const rawId = useId();
   const containerId = "tv_chart_" + rawId.replace(/:/g, "");
