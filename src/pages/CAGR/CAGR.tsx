@@ -20,6 +20,7 @@ import {
   formatMultiplier,
   getCurrencySymbol,
 } from "@/utils/formatters";
+import { CAGRContent } from "./CAGRContent";
 
 export function CAGRPage() {
   const { t, locale, currency } = useI18n();
@@ -190,8 +191,9 @@ export function CAGRPage() {
             </div>
           </div>
         </div>
-        <AdBanner />
       </div>
+      <CAGRContent />
+      <AdBanner />
     </div>
   );
 }

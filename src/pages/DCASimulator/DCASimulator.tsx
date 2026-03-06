@@ -25,6 +25,7 @@ import {
   ResponsiveContainer,
   Legend,
 } from "recharts";
+import { DCASimulatorContent } from "./DCASimulatorContent";
 
 /**
  * Derive the CAGR (Compound Annual Growth Rate) from historical price data.
@@ -417,8 +418,9 @@ export function DCASimulatorPage() {
             </>
           )}
         </div>
-        <AdBanner />
       </div>
+      <DCASimulatorContent />
+      <AdBanner />
     </div>
   );
 }

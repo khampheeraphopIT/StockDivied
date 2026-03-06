@@ -18,6 +18,7 @@ import {
   formatNumber,
   getCurrencySymbol,
 } from "@/utils/formatters";
+import { PositionSizeContent } from "./PositionSizeContent";
 
 export function PositionSizePage() {
   const { t, locale, currency } = useI18n();
@@ -177,8 +178,9 @@ export function PositionSizePage() {
             </div>
           </div>
         </div>
-        <AdBanner />
       </div>
+      <PositionSizeContent />
+      <AdBanner />
     </div>
   );
 }

@@ -7,6 +7,7 @@ import { InputField } from "@/components/ui/Input/Input";
 import { Button } from "@/components/ui/Button/Button";
 import { calculateLoan } from "@/utils/calculators";
 import { formatCurrency, getCurrencySymbol } from "@/utils/formatters";
+import { LoanCalculatorContent } from "./LoanCalculatorContent";
 
 export function LoanCalculatorPage() {
   const { t, currency } = useI18n();
@@ -93,8 +94,9 @@ export function LoanCalculatorPage() {
             </div>
           </div>
         </div>
-        <AdBanner />
       </div>
+      <LoanCalculatorContent />
+      <AdBanner />
     </div>
   );
 }

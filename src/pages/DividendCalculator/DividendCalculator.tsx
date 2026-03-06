@@ -18,6 +18,7 @@ import {
   formatPercent,
   getCurrencySymbol,
 } from "@/utils/formatters";
+import { DividendContent } from "./DividendContent";
 
 export function DividendCalculatorPage() {
   const { t, currency } = useI18n();
@@ -184,6 +185,7 @@ export function DividendCalculatorPage() {
           </div>
         </div>
       </div>
+      <DividendContent />
       <AdBanner layout="horizontal" />
     </div>
   );

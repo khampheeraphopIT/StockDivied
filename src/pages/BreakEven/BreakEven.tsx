@@ -12,6 +12,7 @@ import {
   formatPercent,
   getCurrencySymbol,
 } from "@/utils/formatters";
+import { BreakEvenContent } from "./BreakEvenContent";
 
 export function BreakEvenPage() {
   const { t, currency } = useI18n();
@@ -113,8 +114,9 @@ export function BreakEvenPage() {
             </div>
           </div>
         </div>
-        <AdBanner />
       </div>
+      <BreakEvenContent />
+      <AdBanner />
     </div>
   );
 }

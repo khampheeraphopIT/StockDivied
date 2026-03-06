@@ -5,6 +5,7 @@ import type { TranslationKeys } from "@/i18n/types";
 import { Card } from "@/components/ui/Card/Card";
 import { Button } from "@/components/ui/Button/Button";
 import { AdBanner } from "@/components/ui/AdBanner/AdBanner";
+import { LiveChartPage } from "@/pages/LiveChart/LiveChart";
 import styles from "./Home.module.css";
 
 function getToolName(t: TranslationKeys, toolId: string): string {
@@ -22,7 +23,7 @@ function getToolDesc(t: TranslationKeys, toolId: string): string {
 }
 
 export function HomePage() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const navigate = useNavigate();
 
   return (
@@ -41,6 +42,26 @@ export function HomePage() {
 
       <section className="page-container" style={{ paddingBottom: 0 }}>
         <AdBanner layout="horizontal" />
+      </section>
+
+      {/* Hero Live Chart for massive value */}
+      <section
+        className="page-container"
+        style={{ paddingTop: "2rem", paddingBottom: "2rem" }}
+      >
+        <h2
+          className="page-title"
+          style={{
+            textAlign: "left",
+            marginBottom: "1rem",
+            fontSize: "1.5rem",
+          }}
+        >
+          {locale === "th"
+            ? "ตลาดหุ้นตอนนี้ (Real-Time)"
+            : "Live Market Overview"}
+        </h2>
+        <LiveChartPage isEmbedded={true} />
       </section>
 
       {/* Tools Grid */}

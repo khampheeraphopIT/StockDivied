@@ -18,6 +18,7 @@ import {
   ResponsiveContainer,
   Legend,
 } from "recharts";
+import { CompoundInterestContent } from "./CompoundContent";
 
 export function CompoundInterestPage() {
   const { t, currency } = useI18n();
@@ -179,8 +180,9 @@ export function CompoundInterestPage() {
             </ResponsiveContainer>
           </div>
         </div>
-        <AdBanner />
       </div>
+      <CompoundInterestContent />
+      <AdBanner />
     </div>
   );
 }

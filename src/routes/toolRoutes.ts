@@ -1,4 +1,5 @@
 import type { ComponentType, SVGProps } from "react";
+import { ChartBarIcon } from "@/components/icons/ChartBarIcon";
 import { DividendIcon } from "@/components/icons/DividendIcon";
 import { CompoundIcon } from "@/components/icons/CompoundIcon";
 import { PERatioIcon } from "@/components/icons/PERatioIcon";
@@ -19,6 +20,13 @@ export interface ToolRoute {
 }
 
 export const TOOL_ROUTES: ToolRoute[] = [
+  {
+    id: "liveChart",
+    path: "/live-chart",
+    icon: ChartBarIcon,
+    color: "#3b82f6",
+    category: "stock",
+  },
   {
     id: "dividendCalc",
     path: "/dividend-calculator",

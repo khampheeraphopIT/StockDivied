@@ -173,6 +173,10 @@ export const en: TranslationKeys = {
       difference: "Difference",
       winner: "Better Option",
     },
+    liveChart: {
+      name: "Live Chart",
+      desc: "Interactive real-time candlestick charts and technical analysis.",
+    },
   },
 
   guide: {

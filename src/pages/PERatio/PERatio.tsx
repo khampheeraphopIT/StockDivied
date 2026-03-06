@@ -18,6 +18,7 @@ import {
   formatCurrency,
   getCurrencySymbol,
 } from "@/utils/formatters";
+import { PERatioContent } from "./PERatioContent";
 
 export function PERatioPage() {
   const { t, currency } = useI18n();
@@ -160,8 +161,9 @@ export function PERatioPage() {
             </div>
           </div>
         </div>
-        <AdBanner />
       </div>
+      <PERatioContent />
+      <AdBanner />
     </div>
   );
 }

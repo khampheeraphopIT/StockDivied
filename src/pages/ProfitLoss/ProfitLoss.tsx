@@ -18,6 +18,7 @@ import {
   formatPercent,
   getCurrencySymbol,
 } from "@/utils/formatters";
+import { ProfitLossContent } from "./ProfitLossContent";
 
 export function ProfitLossPage() {
   const { t, locale, currency } = useI18n();
@@ -178,8 +179,9 @@ export function ProfitLossPage() {
             </div>
           </div>
         </div>
-        <AdBanner />
       </div>
+      <ProfitLossContent />
+      <AdBanner />
     </div>
   );
 }

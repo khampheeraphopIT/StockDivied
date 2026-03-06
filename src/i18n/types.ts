@@ -177,6 +177,10 @@ export interface TranslationKeys {
       difference: string;
       winner: string;
     };
+    liveChart: {
+      name: string;
+      desc: string;
+    };
   };
 
   // Guide Page

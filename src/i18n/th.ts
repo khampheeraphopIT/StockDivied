@@ -172,6 +172,10 @@ export const th: TranslationKeys = {
       difference: "ส่วนต่าง",
       winner: "ทางเลือกที่ดีกว่า",
     },
+    liveChart: {
+      name: "กราฟหุ้น Real-Time",
+      desc: "ดูกราฟแท่งเทียนและวิเคราะห์ทางเทคนิคด้วยเครื่องมือระดับโลกจาก TradingView",
+    },
   },
 
   guide: {

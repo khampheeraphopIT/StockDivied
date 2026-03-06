@@ -12,6 +12,7 @@ import { DCASimulatorPage } from "@/pages/DCASimulator/DCASimulator";
 import { LoanCalculatorPage } from "@/pages/LoanCalculator/LoanCalculator";
 import { BreakEvenPage } from "@/pages/BreakEven/BreakEven";
 import { InvestmentComparisonPage } from "@/pages/InvestmentComparison/InvestmentComparison";
+import { LiveChartPage } from "@/pages/LiveChart/LiveChart";
 import { GuidePage } from "@/pages/Guide/Guide";
 import { NotFoundPage } from "@/pages/NotFound/NotFound";
 import { PrivacyPolicyPage } from "@/pages/Legal/PrivacyPolicy";
@@ -23,6 +24,7 @@ const routes: RouteObject[] = [
     element: <Layout />,
     children: [
       { index: true, element: <HomePage /> },
+      { path: "live-chart", element: <LiveChartPage /> },
       { path: "dividend-calculator", element: <DividendCalculatorPage /> },
       { path: "compound-interest", element: <CompoundInterestPage /> },
       { path: "pe-ratio", element: <PERatioPage /> },
